@@ -1,0 +1,200 @@
+
+＃https：//www.toptal.com/developers/gitignore/api/c++,pythonによって作成されました
+＃https：//www.toptal.com/developers/gitignore？templates = c ++、pythonで編集
+
+### C ++ ###
+＃前提条件
+* .d
+
+＃コンパイルされたオブジェクトファイル
+* .slo
+* .lo
+* .o
+* .obj
+
+＃プリコンパイル済みヘッダー
+* .gch
+* .pch
+
+＃コンパイルされたダイナミックライブラリ
+*。それで
+* .dylib
+* .dll
+
+＃Fortranモジュールファイル
+*。モッド
+* .smod
+
+＃コンパイルされた静的ライブラリ
+* .lai
+* .la
+* .a
+* .lib
+
+＃実行可能ファイル
+*。EXE
+*。アウト
+*。アプリ
+
+### Python ###
+＃バイトコンパイル/最適化/DLLファイル
+__pycache__ /
+* .py [cod]
+* $ py.class
+
+＃C拡張機能
+
+＃配布/パッケージング
+.Python
+建てる/
+開発-卵/
+dist/
+ダウンロード/
+卵/
+。卵/
+lib /
+lib64 /
+部品/
+sdist /
+var /
+ホイール/
+share / python-wheels /
+* .egg-info /
+.installed.cfg
+*。卵
+マニフェスト
+
+＃PyInstaller
+＃通常、これらのファイルはテンプレートからのpythonスクリプトによって書かれます
+＃PyInstallerがexeをビルドする前に、日付/その他の情報をexeに挿入します。
+*.manifest
+* .spec
+
+＃インストーラーログ
+pip-log.txt
+pip-delete-this-directory.txt
+
+＃ユニットテスト/カバレッジレポート
+htmlcov /
+.tox /
+.nox /
+。カバレッジ
+。カバレッジ。*
+。キャッシュ
+nosetests.xml
+Coverage.xml
+*。カバー
+* .py、cover
+。仮説/
+.pytest_cache /
+カバー/
+
+＃翻訳
+* .mo
+*。ポット
+
+＃Djangoのもの：
+*。ログ
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+＃フラスコのもの：
+実例/
+.webassets-キャッシュ
+
+＃Scrapyのもの：
+.scrapy
+
+＃Sphinxドキュメント
+docs / _build /
+
+＃PyBuilder
+.pybuilder /
+目標/
+
+＃Jupyter Notebook
+.ipynb_checkpoints
+
+＃IPython
+profile_default /
+ipython_config.py
+
+＃pyenv
+＃ライブラリまたはパッケージの場合、コードは次のようになっているため、これらのファイルを無視することをお勧めします。
+＃複数の環境で実行することを目的としています。それ以外の場合は、チェックインしてください。
+＃.python-version
+
+＃pipenv
+＃pypa / pipenv＃598によると、バージョン管理にPipfile.lockを含めることをお勧めします。
+＃ただし、コラボレーションの場合、プラットフォーム固有の依存関係または依存関係がある場合
+＃クロスプラットフォームのサポートがないため、pipenvは機能しない依存関係をインストールするか、機能しない可能性があります
+＃必要なすべての依存関係をインストールします。
+＃Pipfile.lock
+
+＃詩
+＃Pipfile.lockと同様に、バージョン管理にpoetry.lockを含めることをお勧めします。
+＃これは、再現性を確保するためにバイナリパッケージに特に推奨されます。
+＃ライブラリでは一般的に無視されます。
+＃https：//python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+＃poetry.lock
+
+＃pdm
+＃Pipfile.lockと同様に、バージョン管理にpdm.lockを含めることをお勧めします。
+＃pdm.lock
+＃pdmはプロジェクト全体の構成を.pdm.tomlに保存しますが、含めないことをお勧めします
+＃バージョン管理。
+＃https：//pdm.fming.dev/#use-with-ide
+.pdm.toml
+
+＃PEP 582; たとえば、github.com / David-OConnor/pyflowおよびgithub.com/pdm-project/pdmによって使用されます
+__pypackages__ /
+
+＃セロリのもの
+celerybeat-スケジュール
+celerybeat.pid
+
+＃SageMathの解析済みファイル
+* .sage.py
+
+＃環境
+.env
+.venv
+env /
+venv /
+ENV /
+env.bak/
+venv.bak/
+
+＃スパイダープロジェクトの設定
+.spyderproject
+.spyproject
+
+＃ローププロジェクトの設定
+.ropeproject
+
+＃mkdocsドキュメント
+/サイト
+
+＃mypy
+.mypy_cache /
+.dmypy.json
+dmypy.json
+
+＃パイアタイプチェッカー
+.pyre /
+
+＃pytype静的型アナライザー
+.pytype /
+
+＃Cythonデバッグシンボル
+cython_debug /
+
+＃PyCharm
+＃JetBrains固有のテンプレートは、別のJetBrains.gitignoreで維持されます。
+＃https：//github.com/github/gitignore/blob/main/Global/JetBrains.gitignoreにあります
+＃そして、グローバルgitignoreに追加するか、このファイルにマージすることができます。より核のために
+＃オプション（非推奨）以下のコメントを外して、アイデアフォルダ全体を無視することができます。
+＃。考え/
+
+＃https：//www.toptal.com/developers/gitignore/api/c++,pythonの終わり
