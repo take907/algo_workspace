@@ -198,3 +198,5 @@ cython_debug /
 ＃。考え/
 
 ＃https：//www.toptal.com/developers/gitignore/api/c++,pythonの終わり
+
+test.cpp

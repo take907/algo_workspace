@@ -1,0 +1,770 @@
+void 251E_TakahashiAndAnimals(){
+  int n; cin >> n;
+  vi a(n+1);
+  REP2(i,1,n) cin >> a[i];
+
+  ll ans = LL_INF;
+
+  vvl dp(300005,vl(2));
+
+  REP(t,1){
+    // irenainara INF
+    // irerunara dp[1][0]=0
+    // ireru dp[1][1] = a[i];
+    // t==1
+    // dp[1][1] = a[1]
+    // dp[1][0] = LL_INF
+
+    // t==0
+    // dp[1][0] = 0
+    // dp[1][1] = LL_INF
+    dp[1][t] = a[1]*t;
+    dp[1][1-t] = LL_INF;
+
+    REP2(i,2,n){
+      dp[i][0] = dp[i-1][1];
+      dp[i][1] = min(dp[i-1][0],dp[i-1][1])+a[i];
+    }
+    if(t==0) ans = min(ans,dp[n][1]);
+    if(t==1) ans = min(ans,min(dp[n][0],dp[n][1]));
+  }
+  cout << ans << endl;
+  return;
+}
+
+void 251B_At_Most_3(){
+  int N,W; cin >> N >> W;
+  vi A(N+2);
+  rep(i,N) cin >> A[i];
+  A[N]=A[N+1]=0;
+  set<int> st;
+  rep(i,N){
+    rep2(j,i+1,N+1){
+      rep2(k,j+1,N+2){
+        int sum = 0;
+        sum= A[i]+A[j]+A[k];
+        if(sum<=W){
+          st.insert(sum);
+        }
+      }
+    }
+  }
+  int ans = st.size();
+  cout << ans << endl;
+  return;
+} 
+
+void 251D_At_Most_3(){
+    int W; cin >> W;
+    vi a;
+    REP2(i,1,99){
+        a.push_back(i);
+        a.push_back(i*100);
+        a.push_back(i*10000);
+    }
+    cout << a.size() << endl;
+    vector_output(a);
+    return;
+}
+
+void 251TwoSpanningTree(){
+
+  int N,M;
+  cin >> N >> M;
+  vi G(200005);
+  vb visited(200005);
+  vpi T1,T2;
+
+  void dfs(int v){
+    visited[v] = true;
+    for(auto u: G[v]){
+      if(!visited[u]){
+        T1.push_back(P(v,u));
+        dfs(u);
+      }
+    }
+  }
+
+  void bfs(){
+    REP2(i,1,N) visited[i] = false;
+    que<int> Q;
+    Q.push(1), visited[1] = true;
+
+    int v;
+    while(Q.size()){
+      v = Q.front(), Q.pop();
+      for(auto u: G[v]){
+        if(!visited[u]){
+          T2.push_back(P(v,u));
+          visited[u] = true;
+          Q.push(u);
+        }
+      }
+    }
+  }
+
+  int u,v;
+  REP2(i,1,M){
+    cin >> u >> v;
+    G[u].push_back(v);
+    G[v].push_back(u);
+  }
+  dfs(1);
+  bfs();
+
+  for(auto p: T1) cout << p.first << " " << p.second << endl;
+  for(auto p: T2) cout << p.first << " " << p.second << endl;
+}
+
+void 249A_Jogging(){
+    int A,B,C,D,E,F,X;
+    cin >> A >> B >>C >> D >> E >> F >> X;
+
+    int takahashi = 0;
+    int aoki = 0;
+
+    rep(i,X){
+        int time1 = i%(A+C);
+        if(time1<A) takahashi+=B;
+        
+        int time2 = i%(D+F);
+        if(time2<D) aoki+=E;
+    }
+    if(aoki<takahashi) cout << "Takahashi" << endl;
+    else if(aoki == takahashi) cout << "Draw" << endl;
+    else cout << "Aoki" << endl;
+}
+
+void algo_linked_list(){
+    struct Node {
+        Node* nex;  // 次がどのノードを指すか
+        Node* pre;
+        string value;  // ノードに付随している値
+        Node(const string& value = "") : nex(NULL), value(value) { }
+    };
+
+    // 番兵を表すノード (ここではグローバルに置いておく)
+    Node* nil;
+
+    // 連結リストの初期化
+    void init() {
+        nil = new Node();
+        nil->nex = nil; // 初期状態では nil が nil を指すように
+        nil->pre = nil;
+    }
+
+    // 連結リストへ先頭への要素の挿入
+    void insert(Node* v) {
+        v->nex = nil->nex;  // v の次を、現在の先頭に
+        nil->nex = v;  // 先頭を v に書き換える
+    }
+
+    void PushHead(Node* v){
+    v->nex = nil->nex;
+    v->pre = nil;
+    nil->nex = v;
+    (v->nex)->pre = v;
+    return;
+    }
+
+    string PopTail(){
+    Node *tail = nil->pre;
+    if(tail == nil){
+        return "Error";
+    }else{
+        string ret = tail->value;
+        nil->pre = tail->pre;
+        (nil->pre)->nex = nil;
+        delete tail;
+
+        return ret;
+    }
+    }
+
+    string erase(){
+    Node *front = nil->nex;
+    if(front == nil){
+        return "Error";
+    }else{
+        string ret = front->value;
+        nil->nex = front->nex;
+        delete front;
+        return ret;
+    }
+    }
+}
+
+void abc250e(){
+    int n;  cin >> n;
+  vi a(n),b(n);
+  rep(i,n) cin >> a[i];
+  rep(i,n) cin >> b[i];
+  map<int,int> mp;
+  vi ca(n),cb(n),mx(n);
+
+  rep(i,n){
+    if(!mp.count(a[i])) mp[a[i]] = mp.size()+1;
+    ca[i] = mp.size();
+  }  
+  
+  const int INF = 100100100;
+  set<int> st;
+  int m=0;
+  rep(i,n){
+    st.insert(b[i]);
+    int x = mp[b[i]];
+    if(x==0) x = INF;
+    m = max(m,x);
+    mx[i] = m;
+    cb[i] = st.size();
+  }
+  int q; cin >> q;
+  while(q--){
+    int x,y; cin >> x >> y;
+    x--,y--;
+    if(ca[x]==cb[y] && cb[y]==mx[y]){
+      cout << "Yes" << endl;
+    }else{
+      cout << "No" << endl;
+    }
+  }
+}
+
+void abc249e{
+    ll n,p; cin >> n >> p;
+    vvl dp(3101,vl(3101));
+    vvl sum(3101,vl(3101));
+    dp[0][0] = modPow(25,p-2,p)*26ll%p;
+    vl ten;
+    rep(i,6) ten.push_back(pow(10,i));
+    REP2(i,1,n) sum[0][i] = dp[0][0];
+    REP2(i,1,n){
+        REP2(j,1,n){
+        REP2(k,1,4){
+            if(i-k-1<0) continue;
+            ll x = max(j-ten[k-1]+1,0ll),y = max(j-ten[k]+1,0ll);
+            dp[i][j] += (sum[i-k-1][x] -sum[i-k-1][y]+p)*25;
+            dp[i][j]%=p;
+        }
+        sum[i][j+1] = sum[i][j] +dp[i][j];
+        sum[i][j+1] %= p;
+        }
+    }
+    ll s = 0;
+    rep2(i,1,n) s+=dp[i][n];
+    cout << s%p << endl;
+    return;
+}
+
+void abc249f(){
+    int n,k; cin >> n >> k;
+  vi t(n+1),y(n+1);
+
+  t[0]=1,y[0]=0;
+  REP2(i,1,n){
+    cin >> t[i] >> y[i];
+  }
+
+  ll ans = numeric_limits<ll>::min(), sum=0;
+
+  max_heap<int> ignore;
+  min_heap<int> take;
+
+  for(int i=n;i>=0;--i){
+    if(t[i]==1){
+      ans = max(ans,y[i]+sum);
+      k-=1;
+    }else{
+      if(y[i] >= 0){
+        sum += y[i];
+        take.push(y[i]);
+      }else{
+        ignore.push(y[i]);
+      }
+    }
+    if((int)ignore.size() > k){
+      if(ignore.empty()){
+        break;
+      }
+      const int val = ignore.top();
+      ignore.pop();
+      sum += val;
+      take.push(val);
+    }
+  }
+  cout << ans << endl;
+  return;
+}
+
+void abc247e(){
+  ll N,X,Y;
+  cin >> N >> X >> Y;  
+  vector<int> A(N);
+
+  rep(i,N) cin >> A[i];
+
+  int posX{-1}, posY{-1}, B{-1};
+
+  ll res{};
+  rep(i,N){
+    if(A[i]==X) posX=i;
+    if(A[i]==Y) posY=i;
+    if(A[i]<Y or X<A[i]) B=i;
+    res += max(0,min(posX,posY)-B);
+  }
+  cout << res << endl;
+} 
+
+void abc246e(){
+
+int N;
+int Ax,Ay,Bx,By;
+string S[1510];
+
+int dx2[4]={1,1,-1,-1};
+int dy2[4]={1,-1,1,-1};
+
+int opt[1510][1510][5];
+bool vis[1510][1510][5];
+
+int main() {
+    
+
+    cin >> N;
+
+    cin >> Ay >> Ax >> By >> Bx;
+
+    Ax--,Ay--,Bx--,By--;
+    rep(y,N) cin >> S[y];
+
+    min_heap<pair<int, tuple<int,int,int>>> que;
+    rep(x,N) rep(y,N) rep(dir,5) opt[y][x][dir] = INT_MAX;
+    rep(x,N) rep(y,N) rep(dir,5) vis[y][x][dir] = false;
+
+    opt[Ay][Ax][4]=0;
+    que.push({0,{Ax,Ay,4}});
+
+    while(!que.empty()){
+        int x,y,dir;
+        tie(x,y,dir) = que.top().second;
+        que.pop();
+
+
+        if(vis[y][x][dir]) continue;
+        vis[y][x][dir]=true;
+
+        if(x == Bx && y == By){
+        cout << opt[y][x][dir] << endl;
+        return 0;
+        }
+        rep(d,4){
+        int xx = x+dx2[d];
+        int yy = y+dy2[d];
+
+        if(0 <=xx && xx < N && 0<= yy && yy < N){
+            if(S[yy][xx] == '#') continue;
+            if(chmin(opt[yy][xx][d],opt[y][x][dir]+(dir!=d))){
+            que.push({opt[yy][xx][d],{xx,yy,d}});
+            }
+        }
+        }
+    }
+    cout << -1 << endl;
+    }
+}
+
+void algo_data_structure_linked_list_deque(){
+
+    struct Node {
+        Node* nex;  // 次がどのノードを指すか
+        Node* pre;  // 前がどのノードを指すか
+        string value;  // ノードに付随している値
+        Node(const string& value = "") : nex(NULL), value(value) { }
+    };
+
+    Node* nil;
+
+    void init() {
+        nil = new Node();
+        nil->nex = nil; // 初期状態では nil の次が nil を指すように
+        nil->pre = nil; // 初期状態では nil の前が nil を指すように
+    }
+
+    // 双方向連結リストへ先頭への要素の挿入
+    void PushHead(Node* v) {
+        v->nex = nil->nex;  // v の次を、元の先頭要素に
+        v->pre = nil;   // v の前を nil に
+        nil->nex = v;  // nil の次を v に書き換える
+        (v->nex)->pre = v;  // 元の先頭要素の前を v にする
+        return;
+    }
+
+    // 双方向連結リストへ末尾への要素の挿入
+    void PushTail(Node* v) {
+        v->nex = nil;   // v の次を nil に
+        v->pre = nil->pre;  // v の前を、元の末尾ノードに
+        nil->pre = v;   // nil の前を v に
+        (v->pre)->nex = v;  // 元の末尾ノードの次を v に
+        return;
+    }
+
+    // 双方向連結リストの先頭にある文字列を返し、その要素を削除する
+    string PopHead() {
+        Node *head = nil->nex;  // 先頭のノードを取得する
+        if(head == nil) {
+            // 双方向連結リストが空なら、Error を返す
+            return "Error";
+        }
+        else {
+            string ret = head->value;   // 先頭の文字列を返す
+            nil->nex = head->nex;   // nil の次を、head の次に
+            (nil->nex)->pre = nil;  // 新たな先頭の前を nil に
+            delete head;    // メモリを開放する
+
+            return ret;
+        }
+    }
+
+    // 双方向連結リストの末尾にある文字列を返し、その要素を削除する
+    string PopTail() {
+        Node *tail = nil->pre;  // 末尾のノードを取得する
+        if(tail == nil) {
+            // 双方向連結リストが空なら、Error を返す
+            return "Error";
+        }
+        else {
+            string ret = tail->value;   // 末尾の文字列を返す
+            nil->pre = tail->pre;   // nil の前を、tail の前に
+            (nil->pre)->nex = nil;  // 新たな末尾の次を nil に
+            delete tail;    // メモリを開放する
+
+            return ret;
+        }
+    }
+
+    int main() {
+        // 連結リストの初期化
+        init(); 
+
+        int Q;
+        cin >> Q;
+        for (int i = 0; i < Q; ++i) {
+            int type; cin >> type;
+
+            if(type == 0) {
+                string S; cin >> S;
+                Node *v = new Node(S);  // ノードを作成する
+                PushHead(v);
+            }
+            else if(type == 1) {
+                string S; cin >> S;
+                Node *v = new Node(S);  // ノードを作成する
+                PushTail(v);
+            }
+            else if(type == 2) {
+                cout << PopHead() << endl;
+            }
+            else if(type == 3) {
+                cout << PopTail() << endl;
+            }
+        }
+    }
+}
+
+void abc180b(){
+    double manhatten(vd X){
+        double res=0;
+        rep(i,X.size()) res+=abs(X[i]);
+        return res;
+    }
+
+    double uklid(vd X){
+        double res=0;
+        rep(i,X.size()) res += X[i]*X[i];
+        return sqrt(res);
+    }
+
+    double chebishef(vd X){
+        double res=0;
+        rep(i,X.size()) chmax(res,abs(X[i]));
+        return res;
+    }
+
+    int main(){
+        int N; cin >> N;
+        vd X(N);
+        rep(i,N) cin >> X[i];
+
+        cout << fixed << setprecision(15);
+        cout << manhatten(X) << endl;
+        cout << uklid(X) << endl;
+        cout << chebishef(X) << endl;
+    }
+}
+
+void abc180c(){
+    ll N; cin >> N;
+
+    set<ll> st;
+    REP2(i,1,sqrt(N)){
+        if(N%i==0){
+        st.insert(i);
+        st.insert(N/i);
+        }
+    }
+    // sort(st.begin(),st.end());
+    for(ll v: st){
+        cout << v << endl;
+    }
+}
+
+void abc180e(){
+    int n;
+  cin >> n;
+  vector<int> x(n), y(n), z(n);
+  rep(i,n) cin >> x[i] >> y[i] >> z[i];
+  int n2 = 1<<n;
+  // dp INF initialize
+  vector<vector<int>> dp(n2,vector<int>(n,INF));
+  //  dist 0 initialize
+  vector<vector<int>> dist(n,vector<int>(n));
+
+  rep(i,n)rep(j,n) {
+    // two dimension
+    // now = x[i]-x[j]
+    // two point select
+    //  get dist[i][j]
+    int now = abs(x[i]-x[j]);
+    now += abs(y[i]-y[j]);
+    now += max(0, z[j]-z[i]);
+    dist[i][j] = now;
+  }
+  rep(i,n) {
+    if (i == 0) continue;
+    // update dist from 0
+    dp[1<<i][i] = dist[0][i];
+  }
+  rep(i,n2)rep(j,n) {
+    // i no hitei wo migini shift shita mono ga 1
+    // 
+    if (~i>>j&1) continue;
+    rep(k,n) {
+      if (i>>k&1) continue;
+      chmin(dp[i|1<<k][k], dp[i][j]+dist[j][k]);
+    }
+  }
+  cout << dp[n2-1][0] << endl;
+  return 0;
+}
+
+void abc180f(){
+    const int MX = 305;
+    mint c[MX][MX];
+    mint dp[MX][MX];
+    
+    mint f(int n, int m, int l) {
+    vector<mint> path(l+1);
+    path[1] = 1;
+    path[2] = 1;
+    for (int i = 3; i <= l; ++i) path[i] = path[i-1]*i;
+    vector<mint> cycle(l+1);
+    for (int i = 2; i <= l; ++i) cycle[i] = path[i-1];
+    rep(i,n+1)rep(j,m+1) dp[i][j] = 0;
+    dp[0][0] = 1;
+    rep(i,n+1)rep(j,m+1) {
+        for (int k = 1; k <= l; ++k) {
+        int ni = i+k;
+        int nj = j+k-1;
+        if (ni > n) break;
+        if (nj > m) break;
+        dp[ni][nj] += dp[i][j]*c[n-i-1][k-1]*path[k];
+        }
+        for (int k = 2; k <= l; ++k) {
+        int ni = i+k;
+        int nj = j+k;
+        if (ni > n) break;
+        if (nj > m) break;
+        dp[ni][nj] += dp[i][j]*c[n-i-1][k-1]*cycle[k];
+        }
+    }
+    return dp[n][m];
+    }
+    
+    int main() {
+    c[0][0] = 1;
+    rep(i,MX-1) {
+        rep(j,i+1) {
+        c[i+1][j] += c[i][j];
+        c[i+1][j+1] += c[i][j];
+        }
+    }
+    
+    int n, m, l;
+    cin >> n >> m >> l;
+    mint ans = f(n,m,l) - f(n,m,l-1);
+    cout << ans.val() << endl;
+    return 0;
+    }
+}
+
+void abc180c(){
+  int n;
+  cin >> n;
+  ll ans = 0;
+  for (int a = 1; a <= n; ++a) {
+    ans += (n-1)/a;
+  }
+  cout << ans << endl;
+  return 0;
+}
+
+void abc252d(){
+  int main() {
+  int N;
+  cin >> N;
+  vector< int > A(N);
+  cin >> A;
+  map< int, int > mp;
+  for(auto &a: A) mp[a]++;
+  int64 ret = 0;
+  int64 a = 0, b = 0;
+  for(auto&[_, p]: mp) {
+    ret += b * p;
+    b += a * p;
+    a += p;
+  }
+  cout << ret << "\n";
+}
+}
+
+void abc252e(){
+  struct edge{
+	int to,cost,idx;
+};
+ 
+vector<int> dijkstra(int s,vector<vector<edge>>&G){
+	vector<ll>dist(G.size(),1LL<<60);
+	vector<int>idx(G.size());
+	dist[s]=0;
+	using P=pair<ll,int>;
+	priority_queue<P,vector<P>,greater<P>> pq;
+	pq.push({0,s});
+ 
+	while(!pq.empty()){
+		auto[d,v]=pq.top();
+		pq.pop();
+		if(dist[v]!=d)continue;
+		for(auto[vv,c,i]:G[v]){
+			if(dist[vv]>dist[v]+c){
+				dist[vv]=dist[v]+c;
+				pq.push({dist[vv],vv});
+				idx[vv]=i;  //  <- index 
+			}
+		}
+	}
+	return idx;
+}
+ 
+int main(){
+	int N,M;
+	cin >> N >> M;
+	vector<vector<edge>>G(N);
+	for(int i=0;i<M;i++){
+		int a,b,c;
+		cin >> a >> b >> c;
+		G[a-1].push_back({b-1,c,i});
+		G[b-1].push_back({a-1,c,i});
+	}
+	vector<int> idx=dijkstra(0,G);
+	for(int i=1;i<N;i++)cout << idx[i]+1 << ' ';
+}
+}
+
+void arc141a(){
+  #include <bits/stdc++.h>
+using namespace std;
+int main(){
+  vector<long long> ten(18);
+  ten[0] = 1;
+  for (int i = 0; i < 17; i++){
+    ten[i + 1] = ten[i] * 10;
+  }
+  int T;
+  cin >> T;
+  for (int i = 0; i < T; i++){
+    long long N;
+    cin >> N;
+    int L = to_string(N).size();
+    long long ans = ten[L - 1] - 1;
+    for (int j = 1; j < L; j++){
+      if (L % j == 0){
+        long long q = 0;
+        for (int k = 0; k < L / j; k++){
+          q += ten[k * j];
+        }
+        long long p = N / q * q;
+        ans = max(ans, p);
+      }
+    }
+    cout << ans << endl;
+  }
+}
+}
+
+
+
+void abc253c{
+    #include <bits/stdc++.h>
+    using namespace std;
+
+    int main() {
+        int q;
+        cin >> q;
+        multiset<int> st;
+        while (q--) {
+            int t;
+            cin >> t;
+            if (t == 1) {
+                int x;
+                cin >> x;
+                st.insert(x);
+            } else if (t == 2) {
+                int x, c;
+                cin >> x >> c;
+                while (c-- and st.find(x) != st.end()) {
+                    st.erase(st.find(x));
+                }
+            } else {
+                cout << *st.rbegin() - *st.begin() << endl;
+            }
+        }
+    }
+}
+
+void abc253d(){
+    void solve() {
+    LL(N, a, b);
+    ll g = gcd(a, b);
+    ll lcm = a * b / g;
+    
+    auto f = [&](ll d) -> ll {
+        ll n = N / d;
+        return n * (n + 1) / 2 * d;
+    };
+    
+    ll ANS = f(1) - f(a) - f(b) + f(lcm);
+    print(ANS);
+    }
+    
+    signed main() {
+    cin.tie(nullptr);
+    ios::sync_with_stdio(false);
+    cout << setprecision(15);
+    
+    ll T = 1;
+    // LL(T);
+    FOR(T) solve();
+    
+    return 0;
+    }    
+}
