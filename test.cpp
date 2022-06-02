@@ -502,25 +502,48 @@ ll sigma_tousa(ll a, ll d, ll n) {
   return n * (2 * a + (n - 1) * d) / 2;
 }
 
-// ------------------------------------
-
-void solve() {
-  ll n, a, b;
-  cin >> n >> a >> b;
-  ll g = gcd(a, b);
-  ll lcm = a * b / g;
-
-  auto f = [&](ll d) -> ll {
-    ll m = n / d;
-    return m * (m + 1) / 2 * d;
-  };
-
-  ll ans = f(1) - f(a) - f(b) + f(lcm);
-  cout << ans << endl;
+ll func(ll a, ll n) {
+  ll N = n / a;
+  return a * (N * (N + 1) / 2);
 }
 
-int main() {
+// ------------------------------------
 
-  solve();
+int main() {
+  int n, k;
+  cin >> n >> k;
+  vi p(n), c(n);
+  rep(i, n) cin >> p[i], --p[i];
+  rep(i, n) cin >> c[i];
+
+  ll ans = -LL_INF;
+
+  rep(i, n) {
+    int v = i;
+    ll cycle_sum = 0;
+    int cycle_cnt = 0;
+    while (true) {
+      cycle_cnt++;
+      cycle_sum += c[v];
+      v = p[v];
+      if (v == i) break;
+    }
+    ll path = 0;
+    int cnt = 0;
+
+    while (true) {
+      cnt++;
+      path += c[v];
+
+      if (cnt > k) break;
+      int num = (k - cnt) / cycle_cnt;
+      ll score = path + max(0LL, cycle_sum) * num;
+      chmax(ans, score);
+
+      v = p[v];
+      if (v == i) break;
+    }
+  }
+  cout << ans << endl;
   return 0;
 }
