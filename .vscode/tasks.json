@@ -9,7 +9,10 @@
                 "-g",
                 "/workspaces/algo_workspace/test.cpp",
                 "-o",
-                "/workspaces/algo_workspace/test"
+                "/workspaces/algo_workspace/test",
+                "-std=c++17",
+                "-I",
+                "/workspaces/algo_workspace"
             ],
             "options": {
                 "cwd": "${fileDirname}"

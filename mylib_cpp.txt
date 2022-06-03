@@ -993,7 +993,7 @@ void abc253(){
 
 }
 
-void abc253e2(){
+void abc253e(){
     #include<bits/stdc++.h>
     #include<atcoder/all>
 
@@ -1225,4 +1225,46 @@ abc175d(){
 
         return 0;
     }
+}
+
+abc253a(){
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  int main() {
+      int a, b, c;
+      cin >> a >> b >> c;
+      if ((a <= b and b <= c) or (a >= b and b >= c)) {
+          cout << "Yes\n";
+      } else {
+          cout << "No\n";
+      }
+      return 0;
+  }
+
+}
+
+abc253b(){
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  int main() {
+      int h, w;
+      cin >> h >> w;
+      vector<pair<int, int>> pieces;
+      for (int i = 0; i < h; ++i) {
+          for (int j = 0; j < w; ++j) {
+              char c;
+              cin >> c;
+              if (c == 'o') {
+                  pieces.emplace_back(i, j);
+              }
+          }
+      }
+      const auto& [a, b] = pieces[0];
+      const auto& [c, d] = pieces[1];
+      cout << abs(a - c) + abs(b - d) << '\n';
+      return 0;
+  }
+
 }

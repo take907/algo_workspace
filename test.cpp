@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
-#include <time.h>
-// #include<atcoder/all>
+// #include <time.h>
+#include <atcoder/all>
 
 using namespace std;
-// using namespace atcoder;
+using namespace atcoder;
 
 typedef long long ll;
 typedef long double ld;
@@ -502,48 +502,35 @@ ll sigma_tousa(ll a, ll d, ll n) {
   return n * (2 * a + (n - 1) * d) / 2;
 }
 
-ll func(ll a, ll n) {
-  ll N = n / a;
-  return a * (N * (N + 1) / 2);
+void yes_no(bool question) {
+  cout << (question ? "Yes" : "No") << endl;
 }
 
 // ------------------------------------
 
+using mint = modint998244353;
+
 int main() {
-  int n, k;
-  cin >> n >> k;
-  vi p(n), c(n);
-  rep(i, n) cin >> p[i], --p[i];
-  rep(i, n) cin >> c[i];
-
-  ll ans = -LL_INF;
-
-  rep(i, n) {
-    int v = i;
-    ll cycle_sum = 0;
-    int cycle_cnt = 0;
-    while (true) {
-      cycle_cnt++;
-      cycle_sum += c[v];
-      v = p[v];
-      if (v == i) break;
+  int n, m, k;
+  cin >> n >> m >> k;
+  vector<mint> dp1(m, 1);
+  for (int i = 1; i < n; i++) {
+    vector<mint> dp2(m);
+    rep(j, m) {
+      if (k == 0) {
+        dp2[0] += dp1[j];
+        continue;
+      }
+      if (j + k < m) { dp2[j + k] += dp1[j]; }
+      if (j - k >= 0) {
+        dp2[0] += dp1[j];
+        if (j - k + 1 < m) dp2[j - k + 1] -= dp1[j];
+      }
     }
-    ll path = 0;
-    int cnt = 0;
-
-    while (true) {
-      cnt++;
-      path += c[v];
-
-      if (cnt > k) break;
-      int num = (k - cnt) / cycle_cnt;
-      ll score = path + max(0LL, cycle_sum) * num;
-      chmax(ans, score);
-
-      v = p[v];
-      if (v == i) break;
+    for (int j = 1; j < m; j++) {
+      dp2[j] += dp2[j - 1];
     }
+    dp1 = dp2;
   }
-  cout << ans << endl;
-  return 0;
+  cout << accumulate(begin(dp1), end(dp1), mint()).val() << endl;
 }
