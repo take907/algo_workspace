@@ -506,31 +506,31 @@ void yes_no(bool question) {
   cout << (question ? "Yes" : "No") << endl;
 }
 
+vb get_divisor_table(int n) {
+  vb table(n + 1, false);
+  REP2(i, 1, sqrt(n)) {
+    if (n % i == 0) {
+      table[i] = true;
+      table[n / i] = true;
+    }
+  }
+  return table;
+}
+
 // ------------------------------------
 
 using mint = modint998244353;
 
 int main() {
-  int n, m, k;
-  cin >> n >> m >> k;
-  vector<mint> dp1(m, 1);
-  for (int i = 1; i < n; i++) {
-    vector<mint> dp2(m);
-    rep(j, m) {
-      if (k == 0) {
-        dp2[0] += dp1[j];
-        continue;
-      }
-      if (j + k < m) { dp2[j + k] += dp1[j]; }
-      if (j - k >= 0) {
-        dp2[0] += dp1[j];
-        if (j - k + 1 < m) dp2[j - k + 1] -= dp1[j];
-      }
-    }
-    for (int j = 1; j < m; j++) {
-      dp2[j] += dp2[j - 1];
-    }
-    dp1 = dp2;
+  int a[1000001];
+  int k;
+  cin >> k;
+  a[1] = 7 % k;
+  REP2(i, 2, k) a[i] = (a[i - 1] * 10 + 7) % k;
+
+  REP2(i, 1, k) if (a[i] == 0) {
+    cout << i << endl;
+    return 0;
   }
-  cout << accumulate(begin(dp1), end(dp1), mint()).val() << endl;
+  cout << -1 << endl;
 }
