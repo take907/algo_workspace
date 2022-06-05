@@ -289,7 +289,8 @@ template <class T> int LIS(vector<T> a, bool is_strong = true) {
 }
 
 struct edge {
-  int to, cost;
+  /* data */
+  int to, cost, idx = 0;
 };
 
 void dijkstra(int s, vi &d, vector<vector<edge>> &G) {
@@ -518,19 +519,32 @@ vb get_divisor_table(int n) {
 }
 
 // ------------------------------------
+vector<vector<edge>> G;
+vb used;
+ll sum;
 
-using mint = modint998244353;
+void dfs(int x, int k) {
+  if (k >= 0 && !used[x]) {
+    sum += (x + 1);
+    used[x] = true;
+    for (auto &[v, _, __] : G[x]) {
+      dfs(v, k - 1);
+    }
+  }
+}
 
 int main() {
-  int a[1000001];
-  int k;
-  cin >> k;
-  a[1] = 7 % k;
-  REP2(i, 2, k) a[i] = (a[i - 1] * 10 + 7) % k;
-
-  REP2(i, 1, k) if (a[i] == 0) {
-    cout << i << endl;
-    return 0;
+  int n;
+  cin >> n;
+  ll ans = 0;
+  REP2(i, 1, n) {
+    ll k = i;
+    for (ll d = 2; d * d <= k; d++) {
+      while (k % (d * d) == 0)
+        k /= d * d;
+    }
+    for (ll d = 1; k * d * d <= n; d++)
+      ans++;
   }
-  cout << -1 << endl;
+  cout << ans << endl;
 }
