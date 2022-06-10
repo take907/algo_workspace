@@ -518,33 +518,58 @@ vb get_divisor_table(int n) {
   return table;
 }
 
-// ------------------------------------
-vector<vector<edge>> G;
-vb used;
-ll sum;
-
-void dfs(int x, int k) {
-  if (k >= 0 && !used[x]) {
-    sum += (x + 1);
-    used[x] = true;
-    for (auto &[v, _, __] : G[x]) {
-      dfs(v, k - 1);
+vector<pl> factor(ll x) {
+  vector<pl> ans;
+  for (ll i = 2; i * i <= x; i++)
+    if (x % i == 0) {
+      ans.push_back({i, 1});
+      while ((x /= i) % i == 0)
+        ans.back().second++;
     }
+  if (x != 1) ans.push_back({x, 1});
+  return ans;
+}
+
+template <typename T> T get_median(vector<T> vec) {
+  sort(vec.begin(), vec.end());
+  int n = vec.size();
+  int m = vec.size() / 2;
+  if (n & 1) {
+    return vec[m];
+  } else {
+    return (vec[m] + vec[m - 1]) / 2;
   }
 }
 
+template <typename T> bool is_median(vector<T> vec, T t) {
+  return t == get_median(vec);
+}
+
+template <typename T> T get_manhattan_distance(pair<T, T> s, pair<T, T> t) {
+  return abs(s.first - t.first) + abs(s.second - t.second);
+}
+
+// ------------------------------------
+
+void solve(map<string, int> mp, string judge) {
+  cout << judge + " x " + to_string(mp[judge]) << endl;
+}
+
 int main() {
-  int n;
-  cin >> n;
-  ll ans = 0;
-  REP2(i, 1, n) {
-    ll k = i;
-    for (ll d = 2; d * d <= k; d++) {
-      while (k % (d * d) == 0)
-        k /= d * d;
-    }
-    for (ll d = 1; k * d * d <= n; d++)
-      ans++;
+  int h, w, k;
+  cin >> h >> w >> k;
+  vs c(h);
+  rep(i, h) cin >> c[i];
+  int ans = 0;
+
+  rep(mskh, 1 << h) rep(mskw, 1 << w) {
+    vs c2 = c;
+    rep(y, h) if (mskh & 1 << y) rep(x, w) c2[y][x] = 'R';
+    rep(x, w) if (mskw & 1 << x) rep(y, h) c2[y][x] = 'R';
+
+    int cnt = 0;
+    rep(x, w) rep(y, h) if (c2[y][x] == '#') cnt++;
+    if (cnt == k) ans++;
   }
   cout << ans << endl;
 }
