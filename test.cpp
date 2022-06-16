@@ -556,20 +556,43 @@ void solve(map<string, int> mp, string judge) {
 }
 
 int main() {
-  int h, w, k;
-  cin >> h >> w >> k;
-  vs c(h);
-  rep(i, h) cin >> c[i];
-  int ans = 0;
+  int n, k;
+  cin >> n >> k;
+  vi a(k);
+  cin >> a;
+  vd x(n), y(n);
+  rep(i, n) cin >> x[i] >> y[i];
 
-  rep(mskh, 1 << h) rep(mskw, 1 << w) {
-    vs c2 = c;
-    rep(y, h) if (mskh & 1 << y) rep(x, w) c2[y][x] = 'R';
-    rep(x, w) if (mskw & 1 << x) rep(y, h) c2[y][x] = 'R';
+  vvd dist(n, vd(k));
 
-    int cnt = 0;
-    rep(x, w) rep(y, h) if (c2[y][x] == '#') cnt++;
-    if (cnt == k) ans++;
+  rep(i, n) {
+    rep(j, k) {
+      int id = a[j] - 1;
+      dist[i][j] = hypot(x[i] - x[id], y[i] - y[id]);
+    }
   }
-  cout << ans << endl;
+
+  ld l = 0, r = 1e9;
+  while (abs(r - l) >= 1e-6) {
+    ld mid = (l + r) / 2;
+    vb ok(n, false);
+    rep(i, n) {
+      rep(j, k) {
+        if (dist[i][j] <= mid) ok[i] = true;
+      }
+    }
+    bool flg = true;
+    rep(i, n) {
+      if (!ok[i]) {
+        flg = false;
+        break;
+      }
+    }
+    if (flg)
+      r = mid;
+    else
+      l = mid;
+  }
+  cout << fixed << setprecision(15);
+  cout << r << endl;
 }
