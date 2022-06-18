@@ -549,50 +549,41 @@ template <typename T> T get_manhattan_distance(pair<T, T> s, pair<T, T> t) {
   return abs(s.first - t.first) + abs(s.second - t.second);
 }
 
-// ------------------------------------
-
-void solve(map<string, int> mp, string judge) {
-  cout << judge + " x " + to_string(mp[judge]) << endl;
+template <typename T> int get_num_lower(vector<T> vec, T x) {
+  int res = lower_bound(all(vec), x) - vec.begin();
+  return res;
 }
 
+template <typename T> int get_num_lower_and_equal(vector<T> vec, T x) {
+  int res = upper_bound(all(vec), x) - vec.begin();
+  return res;
+}
+
+template <typename T> int get_num_greater(vector<T> vec, T x) {
+  int res = vec.end() - upper_bound(all(vec), x);
+  return res;
+}
+
+template <typename T> int get_num_greater_and_equal(vector<T> vec, T x) {
+  int res = vec.end() - lower_bound(all(vec), x);
+  return res;
+}
+
+// ------------------------------------
+
 int main() {
-  int n, k;
-  cin >> n >> k;
-  vi a(k);
-  cin >> a;
-  vd x(n), y(n);
-  rep(i, n) cin >> x[i] >> y[i];
+  int n;
+  cin >> n;
+  ll ans = 0;
 
-  vvd dist(n, vd(k));
-
-  rep(i, n) {
-    rep(j, k) {
-      int id = a[j] - 1;
-      dist[i][j] = hypot(x[i] - x[id], y[i] - y[id]);
+  REP2(i, 1, n) {
+    ll k = i;
+    for (ll d = 2; d * d <= k; d++) {
+      while (k % (d * d) == 0)
+        k /= d * d;
     }
+    for (ll d = 1; k * d * d <= n; d++)
+      ans++;
   }
-
-  ld l = 0, r = 1e9;
-  while (abs(r - l) >= 1e-6) {
-    ld mid = (l + r) / 2;
-    vb ok(n, false);
-    rep(i, n) {
-      rep(j, k) {
-        if (dist[i][j] <= mid) ok[i] = true;
-      }
-    }
-    bool flg = true;
-    rep(i, n) {
-      if (!ok[i]) {
-        flg = false;
-        break;
-      }
-    }
-    if (flg)
-      r = mid;
-    else
-      l = mid;
-  }
-  cout << fixed << setprecision(15);
-  cout << r << endl;
+  cout << ans << endl;
 }

@@ -1730,3 +1730,92 @@ abc255b{
 
 
 }
+
+abc255d{
+  #include<bits/stdc++.h>
+
+  using namespace std;
+
+  int main(){
+    int n,q;
+    cin >> n >> q;
+    vector<long long> a(n);
+    for(auto &nx : a){cin >> nx;}
+    sort(a.begin(),a.end());
+
+    vector<long long> rw(n+1,0);
+    for(long long i=0;i<n;i++){rw[i+1]=rw[i]+a[i];}
+
+    for(int i=0;i<q;i++){
+      long long x;
+      cin >> x;
+      int st=0,fi=n-1;
+      while(st<=fi){
+        int te=(st+fi)/2;
+        if(a[te]<x){st=te+1;}
+        else{fi=te-1;}
+      }
+      long long res=x*st;
+      res-=rw[fi+1];
+      res+=(rw[n]-rw[st]);
+      res-=x*(n-st);
+      cout << res << '\n';
+    }
+    return 0;
+  }
+
+}
+
+abc255e{
+  #include <iostream>
+  #include <map>
+  using namespace std;
+  typedef long long ll;
+
+  ll n, m;
+  ll s[200005], x[15];
+  ll b[200005];
+
+  int main(void)
+  {
+    cin >> n >> m;
+    for(int i = 1; i <= n-1; i++) cin >> s[i];
+    for(int i = 1; i <= m; i++) cin >> x[i];
+    
+    for(int i = 2; i <= n; i++) b[i] = s[i-1] - b[i-1];
+    
+    map<ll, ll> mp;
+    for(int i = 1; i <= n; i++){
+      for(int j = 1; j <= m; j++){
+        ll c = x[j] - b[i];
+        if(i % 2 == 0) c *= -1;
+        mp[c]++;
+      }
+    }
+    
+    ll ans = 0;
+    for(auto p : mp) ans = max(ans, p.second);
+    cout << ans << endl;
+    
+    return 0;
+  }
+
+}
+
+abc254d{
+  
+  int n;
+  cin >> n;
+  ll ans = 0;
+
+  REP2(i, 1, n) {
+    ll k = i;
+    for (ll d = 2; d * d <= k; d++) {
+      while (k % (d * d) == 0)
+        k /= d * d;
+    }
+    for (ll d = 1; k * d * d <= n; d++)
+      ans++;
+  }
+  cout << ans << endl;
+}
