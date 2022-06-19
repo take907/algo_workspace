@@ -1819,3 +1819,639 @@ abc254d{
   }
   cout << ans << endl;
 }
+
+edu1{
+  #include <iostream>
+  using namespace std;
+
+  long long N, K, L;
+  long long A[1 << 18];
+
+  bool solve(long long M) {
+      long long cnt = 0, pre = 0;
+      for (int i = 1; i <= N; i++) {
+          if (A[i] - pre >= M && L - A[i] >= M) {
+              cnt += 1;
+              pre = A[i];
+          }
+      }
+      if (cnt >= K) return true;
+      return false;
+  }
+
+  int main() {
+      // Step #1. 入力
+      cin >> N >> L;
+      cin >> K;
+      for (int i = 1; i <= N; i++) {
+          cin >> A[i];
+      }
+      
+      // Step #2. 答えで二分探索（めぐる式二分探索法）
+      // https://qiita.com/drken/items/97e37dd6143e33a64c8c
+      long long left = -1;
+      long long right = L + 1;
+      while (right - left > 1) {
+          long long mid = left + (right - left) / 2;
+          if (solve(mid) == false) right = mid;
+          else left = mid;
+      }
+      cout << left << endl;
+      return 0;
+  }
+}
+
+edu2{
+  #include <iostream>
+  #include <string>
+  using namespace std;
+
+  bool hantei(string S) {
+    int dep = 0;
+    for (int i = 0; i < S.size(); i++) {
+      if (S[i] == '(') dep += 1;
+      if (S[i] == ')') dep -= 1;
+      if (dep < 0) return false;
+    }
+    if (dep == 0) return true;
+    return false;
+  }
+
+  int main() {
+    int N;
+    cin >> N;
+    for (int i = 0; i < (1 << N); i++) {
+      string Candidate = "";
+      for (int j = N - 1; j >= 0; j--) {
+        // メモ : (i & (1 << j)) = 0 というのは、i の j ビット目（2^j の位）が 0 であるための条件。
+        // 　　　頻出なので知っておくようにしましょう。
+        if ((i & (1 << j)) == 0) {
+          Candidate += "(";
+        }
+        else {
+          Candidate += ")";
+        }
+      }
+      bool I = hantei(Candidate);
+      if (I == true) cout << Candidate << endl;
+    }
+    return 0;
+  }
+}
+
+edu3{
+  #include <iostream>
+  #include <vector>
+  #include <queue>
+  using namespace std;
+
+  // 入力
+  int N;
+  int A[1 << 18], B[1 << 18];
+
+  // グラフ
+  const int INF = (1 << 29);
+  vector<int> G[1 << 18];
+  int dist[1 << 18];
+
+  void getdist(int start) {
+    // 幅優先探索（BFS）により、最短距離を計算
+    for (int i = 1; i <= N; i++) dist[i] = INF;
+
+    queue<int> Q;
+    Q.push(start);
+    dist[start] = 0;
+
+    while (!Q.empty()) {
+      int pos = Q.front(); Q.pop();
+      for (int to : G[pos]) {
+        if (dist[to] == INF) {
+          dist[to] = dist[pos] + 1;
+          Q.push(to);
+        }
+      }
+    }
+  }
+
+  int main() {
+    // Step #1. 入力
+    cin >> N;
+    for (int i = 1; i <= N - 1; i++) {
+      cin >> A[i] >> B[i];
+      G[A[i]].push_back(B[i]);
+      G[B[i]].push_back(A[i]);
+    }
+
+    // Step #2. 頂点 1 からの最短距離を求める
+    // maxid1: 頂点 1 から最も離れている（最短距離が長い）頂点
+    getdist(1);
+    int maxn1 = -1, maxid1 = -1;
+    for (int i = 1; i <= N; i++) {
+      if (maxn1 < dist[i]) {
+        maxn1 = dist[i];
+        maxid1 = i;
+      }
+    }
+
+    // Step #3. 頂点 maxid1 からの最短距離を求める
+    // maxn2: 木の直径（最短距離の最大値）
+    getdist(maxid1);
+    int maxn2 = -1;
+    for (int i = 1; i <= N; i++) {
+      maxn2 = max(maxn2, dist[i]);
+    }
+
+    // Step #4. 出力
+    cout << maxn2 + 1 << endl;
+    return 0;
+  }
+}
+
+edu4{
+  int h, w;
+  cin >> h >> w;
+  vvi A(h, vi(w));
+  cin >> A;
+  vvi B(h, vi(w, 0));
+  vi row_sum(h);
+  rep(i, h) {
+    rep(j, w) {
+      row_sum[i] += A[i][j];
+    }
+  }
+  vi col_sum(w);
+  rep(i, w) {
+    rep(j, h) {
+      col_sum[i] += A[j][i];
+    }
+  }
+  rep(i, h) {
+    rep(j, w) {
+      B[i][j] = row_sum[i] + col_sum[j] - A[i][j];
+      cout << B[i][j] << " \n"[j == w - 1];
+    }
+  }
+}
+
+edu5{
+  #include <iostream>
+  using namespace std;
+
+  long long modpow(long long a, long long b, long long m) {
+    long long p = 1, q = a;
+    for (int i = 0; i < 63; i++) {
+      if ((b & (1LL << i)) != 0) {
+        p *= q;
+        p %= m;
+      }
+      q *= q;
+      q %= m;
+    }
+    return p;
+  }
+
+  const long long mod = 1000000007;
+
+  // 入力
+  long long N, B, K;
+  long long C[11];
+
+  // その他の変数
+  long long power10[64];
+  long long DP[64][1009];
+  long long Answer[64][1009];
+
+  int main() {
+    // Step #1. 入力
+    cin >> N >> B >> K;
+    for (int i = 1; i <= K; i++) cin >> C[i];
+    
+    // Step #2. 前計算
+    for (int i = 0; i <= 62; i++) {
+      power10[i] = modpow(10LL, (1LL << i), B);
+    }
+    
+    // Step #3. dp[1][i] を求める
+    for (int i = 1; i <= K; i++) {
+      DP[0][C[i] % B] += 1;
+    }
+
+    // Step #4. dp[1][i], dp[2][i], ..., dp[2^n][i] を求める
+    for (int i = 0; i < 62; i++) {
+      for (int j = 0; j < B; j++) {
+        for (int k = 0; k < B; k++) {
+          int nex = (j * power10[i] + k) % B;
+          DP[i + 1][nex] += DP[i][j] * DP[i][k];
+          DP[i + 1][nex] %= mod;
+        }
+      }
+    }
+
+    // Step #5. 繰り返し二乗法により dp[N][i] を求める
+    Answer[0][0] = 1;
+    for (int i = 0; i < 62; i++) {
+      if ((N & (1LL << i)) != 0LL) {
+        for (int j = 0; j < B; j++) {
+          for (int k = 0; k < B; k++) {
+            int nex = (j * power10[i] + k) % B;
+            Answer[i + 1][nex] += Answer[i][j] * DP[i][k];
+            Answer[i + 1][nex] %= mod;
+          }
+        }
+      }
+      else {
+        for (int j = 0; j < B; j++) Answer[i + 1][j] = Answer[i][j];
+      }
+    }
+
+    // Step #6. 出力
+    cout << Answer[62][0] << endl;
+    return 0;
+  }
+}
+
+edu6{
+  #include <iostream>
+  using namespace std;
+
+  string S;
+  int N,K;
+  int nex[100009][26];
+
+  int main() {
+    // Step #1. 入力
+    cin >> N >> K;
+    cin >> S;
+
+    // Step #2. 前計算
+    for (int i = 0; i < 26; i++) nex[S.size()][i] = S.size();
+    for (int i = (int)S.size() - 1; i >= 0; i--) {
+      for (int j = 0; j < 26; j++) {
+        if ((int)(S[i] - 'a') == j) {
+          nex[i][j] = i;
+        }
+        else {
+          nex[i][j] = nex[i + 1][j];
+        }
+      }
+    }
+
+    // Step #3. 一文字ずつ貪欲に決める
+    string Answer = "";
+    int CurrentPos = 0;
+    for (int i = 1; i <= K; i++) {
+      for (int j = 0; j < 26; j++) {
+        int NexPos = nex[CurrentPos][j];
+        int MaxPossibleLength = (int)(S.size() - NexPos - 1) + i;
+        if (MaxPossibleLength >= K) {
+          Answer += (char)('a' + j);
+          CurrentPos = NexPos + 1;
+          break;
+        }
+      }
+    }
+
+    // Step #4. 出力
+    cout << Answer << endl;
+    return 0;
+  }
+}
+
+edu7{
+  #include <iostream>
+  #include <algorithm>
+  #include <cmath>
+  using namespace std;
+
+  const int INF = 2000000000;
+  int N;
+  int A[300009];
+  int Q;
+  int B[300009];
+
+  int main() {
+    // Step #1. Input
+    cin >> N;
+    for (int i = 1; i <= N; i++) cin >> A[i];
+    cin >> Q;
+    for (int i = 1; i <= Q; i++) cin >> B[i];
+
+    // Step #2. Sorting
+    sort(A + 1, A + N + 1);
+
+    // Step #3. Binary Search
+    for (int i = 1; i <= Q; i++) {
+      int pos1 = lower_bound(A + 1, A + N + 1, B[i]) - A;
+      int Diff1 = INF, Diff2 = INF;
+      if (pos1 <= N) Diff1 = abs(B[i] - A[pos1]);
+      if (pos1 >= 2) Diff2 = abs(B[i] - A[pos1 - 1]);
+      cout << min(Diff1, Diff2) << endl;
+    }
+    return 0;
+  }
+}
+
+abc8{
+  #include <iostream>
+  using namespace std;
+
+  string S;
+  long long mod = 1000000007;
+  long long dp[100009][8];
+
+  int main() {
+    // Step #1. Input
+    int N;
+    cin >> N;
+    cin >> S;
+
+    // Step #2. Dynamic Programming (DP)
+    dp[0][0] = 1;
+    for (int i = 0; i < (int)S.size(); i++) {
+      for (int j = 0; j <= 7; j++) {
+        dp[i + 1][j] += dp[i][j];
+        if (S[i] == 'a' && j == 0) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 't' && j == 1) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 'c' && j == 2) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 'o' && j == 3) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 'd' && j == 4) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 'e' && j == 5) dp[i + 1][j + 1] += dp[i][j];
+        if (S[i] == 'r' && j == 6) dp[i + 1][j + 1] += dp[i][j];
+      }
+      for (int j = 0; j <= 7; j++) dp[i + 1][j] %= mod;
+    }
+
+    // Step #3. Output the answer
+    cout << dp[S.size()][7] << endl;
+    return 0;
+  }
+}
+
+edu9{
+  #include <iostream>
+  #include <cmath>
+  #include <vector>
+  #include <algorithm>
+  using namespace std;
+
+  struct Point {
+    double px, py;
+  };
+
+  Point operator-(const Point& a1, const Point& a2) {
+    return Point{ a1.px - a2.px, a1.py - a2.py };
+  }
+
+  double getangle(Point G) {
+    // 点 G の偏角を求める
+    if (G.py >= 0.0) {
+      double I = G.px / sqrt(G.px * G.px + G.py * G.py);
+      double kaku = acos(I) * 180.0 / 3.14159265358979;
+      return kaku;
+    }
+    else {
+      double I = G.px / sqrt(G.px * G.px + G.py * G.py);
+      double kaku = acos(I) * 180.0 / 3.14159265358979;
+      return 360.0 - kaku;
+    }
+  }
+
+  double getangle2(double I1, double I2) {
+    // [偏角 I1] - [原点] - [偏角 I2] のなす角度を求める
+    // 例えば I1 = 240°、I2 = 30°のとき、求める角度は 150°
+    double res = abs(I1 - I2);
+    if (res >= 180.0) return 360.0 - res;
+    return res;
+  }
+
+  int N;
+  Point G[2009];
+
+  double solve(int pos) {
+    // 最初に偏角の昇順にソートする
+    vector<double> vec;
+    for (int i = 1; i <= N; i++) {
+      if (i == pos) continue;
+      Point SA = G[i] - G[pos];
+      double angle = getangle(SA);
+      vec.push_back(angle);
+    }
+    sort(vec.begin(), vec.end());
+
+    // 点 A を全探索して、最も偏角の大きくなる点 C を二分探索（std::lower_bound）で求める
+    double ret = 0.0;
+    for (int i = 0; i < vec.size(); i++) {
+      double target = vec[i] + 180.0;
+      if (target >= 360.0) target -= 360.0;
+      int pos1 = lower_bound(vec.begin(), vec.end(), target) - vec.begin();
+
+      // 点 C の候補は高々 2 つに絞れる
+      int CandIdx1 = pos1 % vec.size();
+      int CandIdx2 = (pos1 + vec.size() - 1) % vec.size();
+      double Candidate1 = getangle2(vec[i], vec[CandIdx1]);
+      double Candidate2 = getangle2(vec[i], vec[CandIdx2]);
+      ret = max({ ret, Candidate1, Candidate2 });
+    }
+    return ret;
+  }
+
+  // O(N^3) のアルゴリズム（点 A, B, C を全探索）
+  double solve_Slow() {
+    double Answer = 0.0;
+    for (int i = 1; i <= N; i++) {
+      for (int j = 1; j <= N; j++) {
+        for (int k = 1; k <= N; k++) {
+          if (i == j || i == k || j == k) continue;
+          double I1 = getangle(G[i] - G[j]);
+          double I2 = getangle(G[k] - G[j]);
+          Answer = max(Answer, getangle2(I1, I2));
+        }
+      }
+    }
+    return Answer;
+  }
+
+  // O(N^2 log N) のアルゴリズム
+  double solve_Fast() {
+    // 点 B を全探索
+    double Answer = 0.0;
+    for (int i = 1; i <= N; i++) {
+      double ret = solve(i);
+      Answer = max(Answer, ret);
+    }
+    return Answer;
+  }
+
+  int main() {
+    // Step #1. 入力
+    cin >> N;
+    for (int i = 1; i <= N; i++) {
+      cin >> G[i].px >> G[i].py;
+    }
+
+    // Step #2. 出力
+    double FinalAns = solve_Fast();
+    printf("%.12lf\n", FinalAns);
+    return 0;
+  }
+}
+
+edu10{
+  #include <iostream>
+  using namespace std;
+
+  // 入力
+  int N;
+  int C[100009], P[100009];
+  int Q;
+  int L[100009], R[100009];
+
+  // 累積和
+  int Sum1[100009];
+  int Sum2[100009];
+
+  int main() {
+    // Step #1. 入力
+    cin >> N;
+    for (int i = 1; i <= N; i++) cin >> C[i] >> P[i];
+    cin >> Q;
+    for (int i = 1; i <= Q; i++) cin >> L[i] >> R[i];
+
+    // Step #2. 1 組・2 組それぞれの累積和を取る
+    for (int i = 1; i <= N; i++) {
+      Sum1[i] = Sum1[i - 1];
+      Sum2[i] = Sum2[i - 1];
+      if (C[i] == 1) Sum1[i] += P[i];
+      if (C[i] == 2) Sum2[i] += P[i];
+    }
+
+    // Step #3. クエリに答える
+    for (int i = 1; i <= Q; i++) {
+      int Answer1 = Sum1[R[i]] - Sum1[L[i] - 1];
+      int Answer2 = Sum2[R[i]] - Sum2[L[i] - 1];
+      cout << Answer1 << " " << Answer2 << endl;
+    }
+    return 0;
+  }
+}
+
+abc256e{
+  #include <iostream>
+  #include <vector>
+  using namespace std;
+
+  #include "atcoder/dsu.hpp"
+
+  int main() {
+    int N;
+    cin >> N;
+    vector<int> X(N), C(N);
+    for (auto& x : X) cin >> x, --x;
+    for (auto& x : C) cin >> x;
+    atcoder::dsu uf(N);
+    long long ans = 0;
+    for (int i = 0; i < N; i++) {
+      if (uf.same(i, X[i]) == false) {
+        uf.merge(i, X[i]);
+        continue;
+      }
+      int cur = C[i], v = i;
+      do {
+        v = X[v];
+        cur = min(cur, C[v]);
+      } while (v != i);
+      ans += cur;
+    }
+    cout << ans << "\n";
+  }
+
+}
+
+abc256f{
+  #include<bits/stdc++.h>
+  #include<atcoder/all>
+  using namespace std;
+  using namespace atcoder;
+  using mint=modint998244353;
+
+  using S=array<mint,3>;
+  S e(){return S();}
+  S op(S x,S y){return {x[0]+y[0],x[1]+y[1],x[2]+y[2]};}
+
+  int main(){
+    int n,q;
+    cin >> n >> q;
+    vector<S>a(n);
+    for(int i=0;i<n;i++){
+      int t;
+      cin >> t;
+      a[i]={mint(t),mint(t)*i,mint(t)*i*i};
+    }
+    
+    segtree<S,op,e>seg(a);
+    
+    while(q--){
+      int t,x;
+      cin >> t >> x;
+      x--;
+      if(t==1){
+        int y;
+        cin >> y;
+        seg.set(x,{mint(y),mint(y)*x,mint(y)*x*x});
+      }else{
+        S ret=seg.prod(0,x+1);
+        cout << (ret[2]/2-ret[1]*(2*x+3)/2+ret[0]*(x+1)*(x+2)/2).val() << endl;
+      }
+    }
+  }
+
+}
+
+aclj{
+  #include <atcoder/segtree>
+  #include <cstdio>
+  #include <vector>
+
+  using namespace std;
+  using namespace atcoder;
+
+  int op(int a, int b) { return max(a, b); }
+
+  int e() { return -1; }
+
+  int target;
+
+  bool f(int v) { return v < target; }
+
+  int main() {
+      int n, q;
+      scanf("%d %d", &n, &q);
+      vector<int> a(n);
+      for (int i = 0; i < n; i++) {
+          scanf("%d", &(a[i]));
+      }
+
+      segtree<int, op, e> seg(a);
+
+      for (int i = 0; i < q; i++) {
+          int t;
+          scanf("%d", &t);
+          if (t == 1) {
+              int x, v;
+              scanf("%d %d", &x, &v);
+              x--;
+              seg.set(x, v);
+          } else if (t == 2) {
+              int l, r;
+              scanf("%d %d", &l, &r);
+              l--;
+              printf("%d\n", seg.prod(l, r));
+          } else if (t == 3) {
+              int p;
+              scanf("%d %d", &p, &target);
+              p--;
+              printf("%d\n", seg.max_right<f>(p) + 1);
+          }
+      }
+  }
+}
