@@ -586,37 +586,28 @@ template <typename T> T get_nearest(vector<T> &a, T b) {
 
 // ------------------------------------
 
-using mint = modint998244353;
-using S = array<mint, 3>;
-S e() {
-  return S();
-}
-S op(S x, S y) {
-  return {x[0] + y[0], x[1] + y[1], x[2] + y[2]};
-}
-
 int main() {
-  int n, q;
-  cin >> n >> q;
-  vector<S> a(n);
-  rep(i, n) {
-    int t;
-    cin >> t;
-    a[i] = {mint(t), mint(t) * i, mint(t) * i * i};
-  }
-  segtree<S, op, e> seg(a);
-
-  while (q--) {
-    int t, x;
-    cin >> t >> x;
-    x--;
-    if (t == 1) {
-      int y;
-      cin >> y;
-      seg.set(x, {mint(y), mint(y) * i, mint(y) * i * i});
-    } else {
-      S ret = seg.prod(0, x + 1);
-      cout << (ret[2] / 2 - ret[1] * (2 * x + 3) / 2 + ret[0] * (x + 1) * (x + 2) / 2).val() << endl;
+  int n;
+  cin >> n;
+  vb sq(n + 1, false);
+  for (int i = 1; i * i <= n; i++)
+    sq[i * i] = true;
+  vvi d(n + 1);
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j += i) {
+      d[j].push_back(i);
     }
   }
+
+  vi cnt(n + 1);
+  for (int i = 1; i <= n; i++) {
+    int f = 0;
+    for (int j = 0; j < d[i].size(); j++)
+      if (sq[d[i][j]]) f = d[i][j];
+    cnt[i / f]++;
+  }
+  int ans = 0;
+  for (int i = 1; i <= n; i++)
+    ans += cnt[i] * cnt[i];
+  cout << ans << endl;
 }

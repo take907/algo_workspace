@@ -2455,3 +2455,250 @@ aclj{
       }
   }
 }
+
+abc256d{
+  #include<stdio.h>
+
+  int a[200010];
+  int main(){
+    int n;
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+      int l,r;
+      scanf("%d%d",&l,&r);
+      a[l]++;
+      a[r]--;
+    }
+    for(int i=1;i<=200005;i++)a[i]+=a[i-1];
+    for(int i=1;i<=200005;i++){
+      if(a[i-1]==0&&a[i]!=0)printf("%d ",i);
+      if(a[i-1]!=0&&a[i]==0)printf("%d\n",i);
+    }
+  }
+}
+
+abc256f2{
+  #include <bits/stdc++.h>
+  #include <atcoder/all>
+  using namespace std;
+  using namespace atcoder;
+  using ll=long long;
+  const ll mod=998244353;
+  #define rep(i,a) for (ll i=0;i<a;i++)
+
+
+  ll R=(mod+1)/2;
+  struct lazy_S {
+      ll E;
+      ll F;
+      ll size;
+  };
+
+  using lazy_F = ll;
+
+  lazy_S lazy_op(lazy_S l, lazy_S r) {
+      return lazy_S{
+          (l.E+r.E+(l.F*r.size)%mod)%mod,(l.F+r.F)%mod,l.size+r.size
+      };
+  }
+
+  lazy_S lazy_e() { return lazy_S{0, 0, 0}; }
+
+  lazy_S mapping(lazy_F l, lazy_S r) {
+      l%=mod;
+      if(l==0) return r;
+      ll tmp=(r.size*(r.size+1))%mod;
+      tmp*=(l*R)%mod;
+      tmp%=mod;
+      return lazy_S{
+          (r.E+tmp)%mod,(r.F+(l*r.size)%mod)%mod,r.size
+      };
+  }
+
+  //l(r(x))
+  lazy_F composition(lazy_F l, lazy_F r) {
+      return (l+r)%mod;
+  }
+
+  lazy_F lazy_id(){return 0;}
+
+  #define lazy_calc lazy_S,lazy_op,lazy_e,lazy_F,mapping,composition,lazy_id
+
+
+  void solve();
+  // oddloop
+  int main() {
+      ios::sync_with_stdio(false);
+      cin.tie(nullptr);
+      
+      int t=1;
+      //cin>>t;
+      rep(i,t) solve();
+  }
+
+  void solve(){
+      int N,Q;
+      cin>>N>>Q;
+      lazy_segtree<lazy_calc> seg(N);
+      vector<ll> A(N);
+      rep(i,N) seg.set(i,{0,0,1});
+      rep(i,N){
+          ll a;
+          cin>>a;
+          A[i]=a;
+          seg.apply(i,N,a);
+      }
+      rep(i,Q){
+          int t;
+          cin>>t;
+          if(t==1){
+              ll x,v;
+              cin>>x>>v;
+              x--;
+              seg.apply(x,N,v-A[x]);
+              A[x]=v;
+          }else{
+              ll x;
+              cin>>x;
+              cout<<(mod+seg.prod(0,x).E)%mod<<"\n";
+          }
+      }
+  }
+
+
+
+}
+
+abc255c{
+  #include<bits/stdc++.h>
+
+  using namespace std;
+
+  int main(){
+    long long x,a,d,n;
+    cin >> x >> a >> d >> n;
+
+    if(d<0){
+      long long fi=a+d*(n-1);
+      a=fi;
+      d*=-1;
+    }
+
+    long long st=0,fi=(n-1);
+    while(st<=fi){
+      long long te=(st+fi)/2;
+      if((a+d*te)<x){st=te+1;}
+      else{fi=te-1;}
+    }
+    long long res=8e18;
+    for(long long i=max(0ll,st-5);i<=min((n-1),st+5);i++){
+      res=min(abs(a+d*i-x),res);
+    }
+    cout << res << '\n';
+    return 0;
+  }
+
+}
+
+abc171b{
+  int N, K, p[1010];
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N >> K;
+      rep(i, 0, N) cin >> p[i];
+
+      int ans = 0;
+      sort(p, p + N);
+      rep(i, 0, K) ans += p[i];
+      cout << ans << endl;
+  }
+}
+
+abc171c{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  int main() {
+      long long N;
+      cin >> N;
+      string res = "";
+      while (N) {
+          --N;
+          res += (char)('a' + (N % 26));
+          N /= 26;
+      }
+      reverse(res.begin(), res.end());
+      cout << res << endl;
+  }
+}
+
+abc256d{
+  int main() {
+    int n;
+    cin >> n;
+    vpi kukan;
+    rep(i, n) {
+      int l, r;
+      cin >> l >> r;
+      kukan.push_back({l, r});
+    }
+    sort(all(kukan));
+    vpi ans;
+    rep(i, n) {
+      int left = kukan[i].first;
+      int right = kukan[i].second;
+      int index = i + 1;
+      while (index < n && kukan[index].first <= right) {
+        right = max(kukan[index].second, right);
+        i = index;
+        index++;
+      }
+      ans.push_back({left, right});
+    }
+    for (auto [l, r] : ans) {
+      cout << l << " " << r << endl;
+    }
+  }
+}
+
+abc255f{
+  #include <iostream>
+  using namespace std;
+
+  int n;
+  int P[200005], I[200005], Iinv[200005];
+  int L[200005], R[200005];
+
+  bool solve(int s, int t, int S, int T)
+  {
+    int r = P[s], p = Iinv[r];
+    if(p < S || T < p) return false;
+
+    if(p-S > 0){
+      L[r] = P[s+1];
+      if(!solve(s+1, s+p-S, S, p-1)) return false;
+    }
+    if(T-p > 0){
+      R[r] = P[s+p-S+1];
+      if(!solve(s+p-S+1, t, p+1, T)) return false;
+    }
+    return true;
+  }
+
+  int main(void)
+  {
+    cin >> n;
+    for(int i = 1; i <= n; i++) cin >> P[i];
+    for(int i = 1; i <= n; i++) cin >> I[i];
+    for(int i = 1; i <= n; i++) Iinv[I[i]] = i;
+
+    if(P[1] != 1 || !solve(1, n, 1, n)){
+      cout << -1 << endl;
+      return 0;
+    }
+    for(int i = 1; i <= n; i++) cout << L[i] << " " << R[i] << endl;
+
+    return 0;
+  }
+
+}
