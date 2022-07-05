@@ -290,7 +290,7 @@ template <class T> int LIS(vector<T> a, bool is_strong = true) {
 
 struct edge {
   /* data */
-  int to, cost, idx;
+  int to, cost, idx = 0;
 };
 
 void dijkstra(int s, vi &d, vector<vector<edge>> &G) {
@@ -584,9 +584,32 @@ template <typename T> T get_nearest(vector<T> &a, T b) {
     return a[pos2];
 }
 
-//---------------------------------------------------------------------------------------------------
+// ------------------------------------
 
 int main() {
-  ll n, q, x;
-  cin >> n >> q >> x;
+  int n;
+  cin >> n;
+  string s;
+  cin >> s;
+  vd w(n);
+  cin >> w;
+
+  vector<pair<ld, int>> info(n);
+  rep(i, n) {
+    info[i].first = w[i];
+    if (s[i] == '1') info[i].second = 1;
+  }
+  sort(all(info));
+
+  vi cnt_adult(n + 1);
+  vi cnt_child(n + 1);
+  rep(i, n) {
+    if (info[i].second == 1) cnt_adult[i] = 1;
+    if (info[i].second == 0) cnt_child[i] = 1;
+  }
+  rep2(i, 1, n + 1) cnt_adult[i] += cnt_adult[i - 1];
+  rep2(i, 1, n + 1) cnt_child[i] += cnt_child[i - 1];
+  int ans = max(cnt_adult[n], cnt_child[n]);
+  rep(i, n) {}
+  cout << ans << endl;
 }

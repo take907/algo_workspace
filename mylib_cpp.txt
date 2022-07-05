@@ -1,35 +1,143 @@
-void 251E_TakahashiAndAnimals(){
-  int n; cin >> n;
-  vi a(n+1);
-  REP2(i,1,n) cin >> a[i];
+abc251e{
+  #include <iostream>
+  using namespace std;
+  typedef long long ll;
+  const ll inf = 1e18;
 
-  ll ans = LL_INF;
+  int n;
+  int a[300005];
+  ll dp[300005][2];
 
-  vvl dp(300005,vl(2));
-
-  REP(t,1){
-    // irenainara INF
-    // irerunara dp[1][0]=0
-    // ireru dp[1][1] = a[i];
-    // t==1
-    // dp[1][1] = a[1]
-    // dp[1][0] = LL_INF
-
-    // t==0
-    // dp[1][0] = 0
-    // dp[1][1] = LL_INF
-    dp[1][t] = a[1]*t;
-    dp[1][1-t] = LL_INF;
-
-    REP2(i,2,n){
-      dp[i][0] = dp[i-1][1];
-      dp[i][1] = min(dp[i-1][0],dp[i-1][1])+a[i];
+  int main(void)
+  {
+    cin >> n;
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    
+    ll ans = inf;
+    for(int t = 0; t <= 1; t++){
+      dp[1][t] = a[1]*t, dp[1][1-t] = inf;
+      
+      for(int i = 2; i <= n; i++){
+        dp[i][0] = dp[i-1][1];
+        dp[i][1] = min(dp[i-1][0], dp[i-1][1]) + a[i];
+      }
+      if(t == 0) ans = min(ans, dp[n][1]);
+      if(t == 1) ans = min(ans, min(dp[n][0], dp[n][1]));
     }
-    if(t==0) ans = min(ans,dp[n][1]);
-    if(t==1) ans = min(ans,min(dp[n][0],dp[n][1]));
+    cout << ans << endl;
+    
+    return 0;
+  } 
+
+}
+
+abc251g{
+  #include <iostream>
+  using namespace std;
+  typedef long long ll;
+  const ll inf = 1e18;
+
+  ll n, m, q;
+  ll x[55], y[55];
+  ll u[200005], v[200005];
+  ll Q1[55], Q2[55], R[55];
+
+  ll cross(ll p, ll q, ll r, ll s){
+    return p*s - q*r;
   }
-  cout << ans << endl;
-  return;
+
+  int main(void)
+  {
+    cin >> n;
+    for(int i = 1; i <= n; i++) cin >> x[i] >> y[i];
+    x[n+1] = x[1], y[n+1] = y[1];
+    cin >> m;
+    for(int i = 1; i <= m; i++) cin >> u[i] >> v[i];
+    
+    for(int i = 1; i <= n; i++){
+      Q1[i] = x[i+1]-x[i], Q2[i] = y[i+1]-y[i], R[i] = -inf;
+      for(int j = 1; j <= m; j++){
+        R[i] = max(R[i], cross(x[i+1]-x[i], y[i+1]-y[i], x[i]+u[j], y[i]+v[j]));
+      }
+    }
+    
+    cin >> q;
+    ll a, b;
+    for(int k = 1; k <= q; k++){
+      cin >> a >> b;
+      bool ans = true;
+      for(int i = 1; i <= n; i++) if(cross(Q1[i], Q2[i], a, b) < R[i]) ans = false;
+      if(ans) cout << "Yes" << "\n";
+      else cout << "No" << "\n";
+    }
+    
+    return 0;
+  } 
+
+}
+
+abc251f{
+  #include <iostream>
+  #include <utility>
+  #include <queue>
+  using namespace std;
+  typedef long long ll;
+  typedef pair<int, int> P;
+  const ll inf = 1e18;
+
+  int n, m;
+  vector<int> G[200005];
+  bool visited[200005];
+  vector<P> T1, T2;
+
+  void dfs(int v)
+  {
+    visited[v] = true;
+    for(auto u : G[v]){
+      if(!visited[u]){
+        T1.push_back(P(v, u));
+        dfs(u);
+      }
+    }
+  }
+  void bfs()
+  {
+    for(int i = 1; i <= n; i++) visited[i] = false;
+    queue<int> Q;
+    Q.push(1), visited[1] = true;
+    
+    int v;
+    while(Q.size()){
+      v = Q.front(), Q.pop();
+      for(auto u : G[v]){
+        if(!visited[u]){
+          T2.push_back(P(v, u));
+          visited[u] = true;
+          Q.push(u);
+        }
+      }
+    }
+  }
+
+  int main(void)
+  {
+    cin >> n >> m;
+    int u, v;
+    for(int i = 1; i <= m; i++){
+      cin >> u >> v;
+      G[u].push_back(v);
+      G[v].push_back(u);
+    }
+    
+    dfs(1);
+    bfs();
+    
+    for(auto p : T1) cout << p.first << " " << p.second << "\n";
+    for(auto p : T2) cout << p.first << " " << p.second << "\n";
+    
+    return 0;
+  } 
+
 }
 
 void 251B_At_Most_3(){
@@ -637,11 +745,14 @@ void abc252d(){
 }
 }
 
-void abc252e(){
-  struct edge{
+#include<bits/stdc++.h>
+using namespace std;
+using ll=long long;
+
+struct edge{
 	int to,cost,idx;
 };
- 
+
 vector<int> dijkstra(int s,vector<vector<edge>>&G){
 	vector<ll>dist(G.size(),1LL<<60);
 	vector<int>idx(G.size());
@@ -649,7 +760,7 @@ vector<int> dijkstra(int s,vector<vector<edge>>&G){
 	using P=pair<ll,int>;
 	priority_queue<P,vector<P>,greater<P>> pq;
 	pq.push({0,s});
- 
+
 	while(!pq.empty()){
 		auto[d,v]=pq.top();
 		pq.pop();
@@ -664,7 +775,7 @@ vector<int> dijkstra(int s,vector<vector<edge>>&G){
 	}
 	return idx;
 }
- 
+
 int main(){
 	int N,M;
 	cin >> N >> M;
@@ -677,7 +788,6 @@ int main(){
 	}
 	vector<int> idx=dijkstra(0,G);
 	for(int i=1;i<N;i++)cout << idx[i]+1 << ' ';
-}
 }
 
 void arc141a(){
@@ -1086,7 +1196,6 @@ void abc253e(){
 
     int main() {
       int n, m, k;
-      cin >> n >> m >> k;
       using mint = modint998244353;
       vector<mint> dp1(m, 1);
       for (int i = 1; i < n; i++) {
@@ -1109,6 +1218,42 @@ void abc253e(){
       }
       cout << accumulate(begin(dp1), end(dp1), mint()).val() << endl;
     }
+}
+
+abc253e2{
+  #include <bits/stdc++.h>
+  using namespace std;
+  const long long MOD = 998244353;
+  int main(){
+    int N, M, K;
+    cin >> N >> M >> K;
+    vector<vector<long long>> dp(N, vector<long long>(M, 0));
+    for (int i = 0; i < M; i++){
+      dp[0][i] = 1;
+    }
+    for (int i = 0; i < N - 1; i++){
+      vector<long long> S(M + 1);
+      S[0] = 0;
+      for (int j = 0; j < M; j++){
+        S[j + 1] = S[j] + dp[i][j];
+        S[j + 1] %= MOD;
+      }
+      for (int j = 0; j < M; j++){
+        dp[i + 1][j] = S[M];
+        if (K > 0){
+          dp[i + 1][j] -= S[min(j + K, M)] - S[max(j - K + 1, 0)];
+        }
+        dp[i + 1][j] += MOD;
+        dp[i + 1][j] %= MOD;
+      }
+    }
+    long long ans = 0;
+    for (int i = 0; i < M; i++){
+      ans += dp[N - 1][i];
+    }
+    ans %= MOD;
+    cout << ans << endl;
+  }
 }
 
 abc175d(){
@@ -2701,4 +2846,634 @@ abc255f{
     return 0;
   }
 
+}
+
+abc170d{
+  const int MA = 1000001;
+  int N, A[201010];
+  int cnt[1010101];
+  bool ok[1010101];
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N;
+      rep(i, 0, N) cin >> A[i];
+
+      rep(i, 0, N) cnt[A[i]]++;
+      rep(x, 1, MA) ok[x] = true;
+      rep(x, 1, MA) if(0 < cnt[x]) {
+          if (1 < cnt[x]) ok[x] = false;
+          for (int x2 = x * 2; x2 < MA; x2 += x) ok[x2] = false;
+      }
+
+      int ans = 0;
+      rep(i, 0, N) if (ok[A[i]]) ans++;
+      cout << ans << endl;
+  }
+}
+
+abc170e{
+  #include<bits/stdc++.h>
+  #define rep(i,a,b) for(int i=a;i<b;i++)
+  #define rrep(i,a,b) for(int i=a;i>=b;i--)
+  #define fore(i,a) for(auto &i:a)
+  #define all(x) (x).begin(),(x).end()
+  //#pragma GCC optimize ("-O3")
+  using namespace std; void _main(); int main() { cin.tie(0); ios::sync_with_stdio(false); _main(); }
+  typedef long long ll; const int inf = INT_MAX / 2; const ll infl = 1LL << 60;
+  template<class T>bool chmax(T& a, const T& b) { if (a < b) { a = b; return 1; } return 0; }
+  template<class T>bool chmin(T& a, const T& b) { if (b < a) { a = b; return 1; } return 0; }
+  //---------------------------------------------------------------------------------------------------
+  #define def inf
+  template<class V, int NV> struct SegTree { //[l,r)
+      V comp(V& l, V& r) { return min(l, r); };
+
+      vector<V> val; SegTree() { val = vector<V>(NV * 2, def); }
+      V get(int x, int y, int l = 0, int r = NV, int k = 1) {
+          if (r <= x || y <= l)return def; if (x <= l && r <= y)return val[k];
+          auto a = get(x, y, l, (l + r) / 2, k * 2);
+          auto b = get(x, y, (l + r) / 2, r, k * 2 + 1);
+          return comp(a, b);
+      }
+      void update(int i, V v) {
+          i += NV; val[i] = v;
+          while (i > 1) i >>= 1, val[i] = comp(val[i * 2], val[i * 2 + 1]);
+      }
+      void add(int i, V v) { update(i, val[i + NV] + v); }
+      V operator[](int x) { return get(x, x + 1); }
+  };
+
+  int N, Q, A[201010], B[201010];
+  SegTree<int, 1 << 18> st;
+  multiset<int> rates[201010];
+  int cnt[201010];
+  //---------------------------------------------------------------------------------------------------
+  void add(int child, int to) {
+      cnt[to]++;
+      rates[to].insert(A[child]);
+      st.update(to, *rates[to].rbegin());
+  }
+  void erase(int child, int from) {
+      cnt[from]--;
+      auto ite = rates[from].find(A[child]);
+      rates[from].erase(ite);
+
+      if (cnt[from] == 0) st.update(from, inf);
+      else st.update(from, *rates[from].rbegin());
+  }
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N >> Q;
+      rep(i, 1, N + 1) {
+          cin >> A[i] >> B[i];
+          add(i, B[i]);
+      }
+
+      rep(_, 0, Q) {
+          int C, D; cin >> C >> D;
+          erase(C, B[C]);
+          B[C] = D;
+          add(C, B[C]);
+
+          int ans = st.get(0, 201010);
+          printf("%d\n", ans);
+      }
+  }
+
+}
+
+algo_logic_segtree{
+  /* RMQ：[0,n-1] について、区間ごとの最小値を管理する構造体
+    update(i,x): i 番目の要素を x に更新。O(log(n))
+    query(a,b): [a,b) での最小の要素を取得。O(log(n))
+  */
+  template <typename T>
+  struct RMQ {
+      const T INF = numeric_limits<T>::max();
+      int n;         // 葉の数
+      vector<T> dat; // 完全二分木の配列
+      RMQ(int n_) : n(), dat(n_ * 4, INF) { // 葉の数は 2^x の形
+          int x = 1;
+          while (n_ > x) {
+              x *= 2;
+          }
+          n = x;
+      }
+      void update(int i, T x) {
+          i += n - 1;
+          dat[i] = x;
+          while (i > 0) {
+              i = (i - 1) / 2;  // parent
+              dat[i] = min(dat[i * 2 + 1], dat[i * 2 + 2]);
+          }
+      }
+      // the minimum element of [a,b)
+      T query(int a, int b) { return query_sub(a, b, 0, 0, n); }
+      T query_sub(int a, int b, int k, int l, int r) {
+          if (r <= a || b <= l) {
+              return INF;
+          } else if (a <= l && r <= b) {
+              return dat[k];
+          } else {
+              T vl = query_sub(a, b, k * 2 + 1, l, (l + r) / 2);
+              T vr = query_sub(a, b, k * 2 + 2, (l + r) / 2, r);
+              return min(vl, vr);
+          }
+      }
+  };
+}
+
+
+algo_logic_segtree2{
+  /* RMQ：[0,n-1] について、区間ごとの最小値を管理する構造体
+    update(a,b,x): 区間[a,b) の要素を x に更新。O(log(n))
+    query(a,b): [a,b) での最小の要素を取得。O(log(n))
+  */
+  template <typename T>
+  struct RMQ {
+      const T INF = numeric_limits<T>::max();
+      int n;
+      vector<T> dat, lazy;
+      RMQ(int n_) : n(), dat(n_ * 4, INF), lazy(n_ * 4, INF) {
+          int x = 1;
+          while (n_ > x) x *= 2;
+          n = x;
+      }
+
+      /* lazy eval */
+      void eval(int k) {
+          if (lazy[k] == INF) return;  // 更新するものが無ければ終了
+          if (k < n - 1) {             // 葉でなければ子に伝搬
+              lazy[k * 2 + 1] = lazy[k];
+              lazy[k * 2 + 2] = lazy[k];
+          }
+          // 自身を更新
+          dat[k] = lazy[k];
+          lazy[k] = INF;
+      }
+
+      void update(int a, int b, T x, int k, int l, int r) {
+          eval(k);
+          if (a <= l && r <= b) {  // 完全に内側の時
+              lazy[k] = x;
+              eval(k);
+          } else if (a < r && l < b) {                     // 一部区間が被る時
+              update(a, b, x, k * 2 + 1, l, (l + r) / 2);  // 左の子
+              update(a, b, x, k * 2 + 2, (l + r) / 2, r);  // 右の子
+              dat[k] = min(dat[k * 2 + 1], dat[k * 2 + 2]);
+          }
+      }
+      void update(int a, int b, T x) { update(a, b, x, 0, 0, n); }
+
+      T query_sub(int a, int b, int k, int l, int r) {
+          eval(k);
+          if (r <= a || b <= l) {  // 完全に外側の時
+              return INF;
+          } else if (a <= l && r <= b) {  // 完全に内側の時
+              return dat[k];
+          } else {  // 一部区間が被る時
+              T vl = query_sub(a, b, k * 2 + 1, l, (l + r) / 2);
+              T vr = query_sub(a, b, k * 2 + 2, (l + r) / 2, r);
+              return min(vl, vr);
+          }
+      }
+      T query(int a, int b) { return query_sub(a, b, 0, 0, n); }
+
+      /* debug */
+      inline T operator[](int a) { return query(a, a + 1); }
+      void print() {
+          for (int i = 0; i < 2 * n - 1; ++i) {
+              cout << (*this)[i];
+              if (i != n) cout << ",";
+          }
+          cout << endl;
+      }
+  };
+}
+
+algo_logic_segtree3{
+  /* RMQ：[0,n-1] について、区間ごとの最小値を管理する構造体
+    set(int i, T x), build(): i番目の要素をxにセット。まとめてセグ木を構築する。O(n)
+    update(i,x): i 番目の要素を x に更新。O(log(n))
+    query(a,b): [a,b) での最小の要素を取得。O(log(n))
+    find_rightest(a,b,x): [a,b) で x以下の要素を持つ最右位置を求める。O(log(n))
+    find_leftest(a,b,x): [a,b) で x以下の要素を持つ最左位置を求める。O(log(n))
+  */
+  template <typename T>
+  struct RMQ {
+      const T e = numeric_limits<T>::max();
+      function<T(T, T)> fx = [](T x1, T x2) -> T { return min(x1, x2); };
+      int n;
+      vector<T> dat;
+      RMQ(int n_) : n(), dat(n_ * 4, e) {
+          int x = 1;
+          while (n_ > x) {
+              x *= 2;
+          }
+          n = x;
+      }
+
+      void set(int i, T x) { dat[i + n - 1] = x; }
+      void build() {
+          for (int k = n - 2; k >= 0; k--) dat[k] = fx(dat[2 * k + 1], dat[2 * k + 2]);
+      }
+
+      void update(int i, T x) {
+          i += n - 1;
+          dat[i] = x;
+          while (i > 0) {
+              i = (i - 1) / 2;  // parent
+              dat[i] = fx(dat[i * 2 + 1], dat[i * 2 + 2]);
+          }
+      }
+
+      // the minimum element of [a,b)
+      T query(int a, int b) { return query_sub(a, b, 0, 0, n); }
+      T query_sub(int a, int b, int k, int l, int r) {
+          if (r <= a || b <= l) {
+              return e;
+          } else if (a <= l && r <= b) {
+              return dat[k];
+          } else {
+              T vl = query_sub(a, b, k * 2 + 1, l, (l + r) / 2);
+              T vr = query_sub(a, b, k * 2 + 2, (l + r) / 2, r);
+              return fx(vl, vr);
+          }
+      }
+
+      int find_rightest(int a, int b, T x) { return find_rightest_sub(a, b, x, 0, 0, n); }
+      int find_leftest(int a, int b, T x) { return find_leftest_sub(a, b, x, 0, 0, n); }
+      int find_rightest_sub(int a, int b, T x, int k, int l, int r) {
+          if (dat[k] > x || r <= a || b <= l) {  // 自分の値がxより大きい or [a,b)が[l,r)の範囲外ならreturn a-1
+              return a - 1;
+          } else if (k >= n - 1) {  // 自分が葉ならその位置をreturn
+              return (k - (n - 1));
+          } else {
+              int vr = find_rightest_sub(a, b, x, 2 * k + 2, (l + r) / 2, r);
+              if (vr != a - 1) {  // 右の部分木を見て a-1 以外ならreturn
+                  return vr;
+              } else {  // 左の部分木を見て値をreturn
+                  return find_rightest_sub(a, b, x, 2 * k + 1, l, (l + r) / 2);
+              }
+          }
+      }
+      int find_leftest_sub(int a, int b, T x, int k, int l, int r) {
+          if (dat[k] > x || r <= a || b <= l) {  // 自分の値がxより大きい or [a,b)が[l,r)の範囲外ならreturn b
+              return b;
+          } else if (k >= n - 1) {  // 自分が葉ならその位置をreturn
+              return (k - (n - 1));
+          } else {
+              int vl = find_leftest_sub(a, b, x, 2 * k + 1, l, (l + r) / 2);
+              if (vl != b) {  // 左の部分木を見て b 以外ならreturn
+                  return vl;
+              } else {  // 右の部分木を見て値をreturn
+                  return find_leftest_sub(a, b, x, 2 * k + 2, (l + r) / 2, r);
+              }
+          }
+      }
+  };
+}
+
+algo_logic_segtree4{
+  /* SegTree<X>(n,fx,ex): モノイド(集合X, 二項演算fx, 単位元ex)についてサイズnで構築
+    set(int i, X x), build(): i番目の要素をxにセット。まとめてセグ木を構築する。O(n)
+    update(i,x): i 番目の要素を x に更新。O(log(n))
+    query(a,b): [a,b) 全てにfxを作用させた値を取得。O(log(n))
+  */
+  template <typename X>
+  struct SegTree {
+      using FX = function<X(X, X)>; // X•X -> X となる関数の型
+      int n;
+      FX fx;
+      const X ex;
+      vector<X> dat;
+      SegTree(int n_, FX fx_, X ex_) : n(), fx(fx_), ex(ex_), dat(n_ * 4, ex_) {
+          int x = 1;
+          while (n_ > x) {
+              x *= 2;
+          }
+          n = x;
+      }
+
+      void set(int i, X x) { dat[i + n - 1] = x; }
+      void build() {
+          for (int k = n - 2; k >= 0; k--) dat[k] = fx(dat[2 * k + 1], dat[2 * k + 2]);
+      }
+
+      void update(int i, X x) {
+          i += n - 1;
+          dat[i] = x;
+          while (i > 0) {
+              i = (i - 1) / 2;  // parent
+              dat[i] = fx(dat[i * 2 + 1], dat[i * 2 + 2]);
+          }
+      }
+
+      X query(int a, int b) { return query_sub(a, b, 0, 0, n); }
+      X query_sub(int a, int b, int k, int l, int r) {
+          if (r <= a || b <= l) {
+              return ex;
+          } else if (a <= l && r <= b) {
+              return dat[k];
+          } else {
+              X vl = query_sub(a, b, k * 2 + 1, l, (l + r) / 2);
+              X vr = query_sub(a, b, k * 2 + 2, (l + r) / 2, r);
+              return fx(vl, vr);
+          }
+      }
+  };
+}
+
+abc257c{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  int main() {
+    int n, x, ans;
+    string s;
+    vector<pair<int, char> >a;
+    cin >> n;
+    cin >> s;
+    ans = 0;
+    for (int i = 0; i < n; i++) {
+      cin >> x;
+      a.push_back({ x,s[i] });
+      if (s[i] == '1')ans++;
+    }
+    sort(a.begin(), a.end());
+    x = ans;
+    for (int i = 0; i < n; i++) {
+      if (a[i].second == '1')x--;
+      else x++;
+      if (i < (n - 1)) {
+        if (a[i].first != a[i + 1].first)ans = max(ans, x);
+      }
+      else ans = max(ans, x);
+    }
+    cout << ans << endl;
+    return 0;
+  }
+
+}
+
+abc257d{
+  #include<bits/stdc++.h>
+  using namespace std;
+
+  int main(){
+    int N;
+    cin >> N;
+    vector<vector<long long>>data(N);
+    for(int i=0;i<N;i++){
+      int x,y,p;
+      cin >> x >> y >> p;
+      data[i]={x,y,p};
+    }
+    
+    vector<vector<long long>>dist(N,vector<long long>(N));
+    for(int i=0;i<N;i++)for(int j=0;j<N;j++){
+      dist[i][j]=(abs(data[i][0]-data[j][0])+abs(data[i][1]-data[j][1])+data[i][2]-1)/data[i][2];
+    }
+
+    for(int k=0;k<N;k++)for(int i=0;i<N;i++)for(int j=0;j<N;j++)dist[i][j]=min(dist[i][j],max(dist[i][k],dist[k][j]));
+
+    long long ans=1e15;
+    for(int i=0;i<N;i++){
+      long long tans=0;
+      for(int j=0;j<N;j++)tans=max(tans,dist[i][j]);
+      ans=min(ans,tans);
+    }
+    cout << ans << endl;
+  }
+
+}
+
+abc257e{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  using ll = long long;
+
+  int main() {
+      int n;
+      cin >> n;
+      vector<int> c(10);
+      for(int i = 1; i <= 9; i++) cin >> c[i];
+
+      int mn = *min_element(c.begin() + 1, c.end());
+      int length = n / mn;
+
+      string ans = "";
+
+      for(int i = 0; i < length; i++) {
+          for(int j = 9; j >= 1; j--) {
+              if((ll)mn * (length - 1 - i) + c[j] <= n) {
+                  n -= c[j];
+                  ans.push_back((char)('0' + j));
+                  break;
+              }
+          }
+      }
+
+      cout << ans << endl;
+
+      return 0;
+  }
+
+}
+
+abc257f{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  #define rep(i, n) for(int i = 0; i < n; ++i)
+  #define N 300010
+  #define INF (int)1e+9
+
+  int main(void) {
+    int n, m;
+    bool ex[N];
+    bool used[N];
+    rep(i, N)ex[i] = false;
+    vector<int>e[N];
+    int d[2][N];
+    queue<int>q;
+    int mn[2];
+    int x, y;
+
+    cin >> n >> m;
+    for (int i = 0; i < m; i++) {
+      cin >> x >> y;
+      if (x == 0)ex[y - 1] = true;
+      else {
+        e[x - 1].push_back(y - 1);
+        e[y - 1].push_back(x - 1);
+      }
+    }
+
+    for (int i = 0; i < n; i++)d[0][i] = INF;
+    for (int i = 0; i < n; i++)used[i] = false;
+    mn[0] = INF;
+    used[0] = true;
+    d[0][0] = 0;
+    q.push(0);
+    while (!q.empty()) {
+      x = q.front();
+      q.pop();
+      if (ex[x])mn[0] = min(mn[0], d[0][x]);
+      y = e[x].size();
+      for (int i = 0; i < y; i++) {
+        if (!used[e[x][i]]) {
+          used[e[x][i]] = true;
+          d[0][e[x][i]] = d[0][x] + 1;
+          q.push(e[x][i]);
+        }
+      }
+    }
+
+    for (int i = 0; i < n; i++)d[1][i] = INF;
+    for (int i = 0; i < n; i++)used[i] = false;
+    mn[1] = INF;
+    used[n - 1] = true;
+    d[1][n - 1] = 0;
+    q.push(n - 1);
+    while (!q.empty()) {
+      x = q.front();
+      q.pop();
+      if (ex[x])mn[1] = min(mn[1], d[1][x]);
+      y = e[x].size();
+      for (int i = 0; i < y; i++) {
+        if (!used[e[x][i]]) {
+          used[e[x][i]] = true;
+          d[1][e[x][i]] = d[1][x] + 1;
+          q.push(e[x][i]);
+        }
+      }
+    }
+
+    for (int i = 0; i < n; i++) {
+      x = min(d[0][n - 1], mn[0] + mn[1] + 2);
+      x = min(x, mn[0] + 1 + d[1][i]);
+      x = min(x, mn[1] + 1 + d[0][i]);
+      if (x < INF)cout << x;
+      else cout << -1;
+      if (i < (n - 1))cout << " ";
+      else cout << endl;
+    }
+
+    return 0;
+  }
+
+}
+
+abc252g1{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  #define MOD 998244353
+
+  int main() {
+    int n;
+    int a[501];
+    long long dp[501][501][2];
+
+    cin >> n;
+    for (int i = 0; i < n; i++)cin >> a[i];
+    a[n + 1] = n + 1;
+
+    for (int r = 0; r < n; r++) {
+      for (int i = 0; i < 2; i++)dp[r][r][i] = 1LL;
+      for (int l = r - 1; l >= 0; l--) {
+        for (int i = 0; i < 2; i++)dp[l][r][i] = 0LL;
+        for (int k = l; k < r; k++) {
+          dp[l][r][0] = (dp[l][r][0] + (dp[l][k][1] * dp[k + 1][r][0])) % MOD;
+          if (a[k + 1] < a[r + 1])dp[l][r][1] = (dp[l][r][1] + (dp[l][k][1] * dp[k + 1][r][0])) % MOD;
+        }
+      }
+    }
+
+    cout << dp[0][n - 1][0] << endl;
+    return 0;
+  }
+
+}
+abc252g2{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  #define MOD 998244353
+
+  int main() {
+    int n;
+    int a[500];
+    long long dp[501][501];
+
+    cin >> n;
+    for (int i = 0; i < n; i++)cin >> a[i];
+
+    for (int l = n; l >= 1; l--) {
+      dp[l][l] = 1;
+      for (int r = l + 1; r <= n; r++) {
+        dp[l][r] = dp[l + 1][r];
+        for (int k = l + 1; k < r; k++) {
+          if (a[l] < a[k])dp[l][r] = (dp[l][r] + (dp[l + 1][k] * dp[k][r])) % MOD;
+        }
+      }
+    }
+
+    cout << dp[1][n] << endl;
+    return 0;
+  }
+
+}
+
+arc143{
+  #include <iostream>
+  #include <algorithm>
+  #include <bitset>
+  #include <cmath>
+  #include <functional>
+  #include <iomanip>
+  #include <map>
+  #include <numeric>
+  #include <queue>
+  #include <random>
+  #include <regex>
+  #include <set>
+  #include <sstream>
+  #include <stack>
+  #include <string>
+  #include <unordered_set>
+  #include <vector>
+  using namespace std;
+
+  #include <atcoder/all>
+  using namespace atcoder;
+  //using mint = modint;
+  //using mint = modint1000000007;
+  using mint = modint998244353;
+
+  struct comb {
+    vector<mint> F, IF;
+    comb(int size) {
+      F.resize(size);
+      IF.resize(size);
+      F[0] = 1, IF[0] = 1;
+      for (int i = 1; i < size; i++) {
+        F[i] = F[i - 1] * i;
+        IF[i] = F[i].inv();
+      }
+    }
+    mint c(int a, int b) {
+      if (a < b || b < 0) return 0;
+      return F[a] * IF[b] * IF[a - b];
+    }
+  };
+  int main() {
+    int N;
+    cin >> N;
+    comb c(N * N + 1);
+    mint ans = c.F[N * N] - N * N * c.c(N * N, N + N - 1) * c.F[N - 1] * c.F[N - 1] * c.F[N * N - N - N + 1];
+    cout << ans.val() << endl;
+
+  }
 }
