@@ -584,9 +584,99 @@ template <typename T> T get_nearest(vector<T> &a, T b) {
     return a[pos2];
 }
 
+queue<pair<char, int>> makeRunLength(string s) {
+  int n = s.size();
+  queue<pair<char, int>> res;
+  for (int i = 0; i < n; i++) {
+    int cnt = 1;
+    char c = s[i];
+    while (i < n && s[i] == s[i + 1]) {
+      i++, cnt++;
+    }
+    res.push({c, cnt});
+  }
+  return res;
+}
+
+template <typename T> pair<T, T> originRotate(T x, T y, T d) {
+  T r = hypot(x, y);
+  T theta = atan2(y, x);
+  theta += d * acos(-1.0) / 180.0;
+
+  T rotateX = cos(theta) * r;
+  T rotateY = sin(theta) * r;
+
+  return {rotateX, rotateY};
+}
+
+class Point {
+private:
+  long double x, y;
+
+public:
+  Point(long double x, long double y) : x(x), y(y) {}
+  long double get_dist_square(Point other) {
+    long double X, Y;
+    X = this->x - other.x;
+    Y = this->y - other.y;
+    return X * X + Y * Y;
+  }
+  long double get_dist(Point other) {
+    return sqrt(get_dist(other));
+  }
+};
+
+class Circle {
+private:
+  Point p;
+  long double r;
+
+public:
+  Circle(Point p, long double r) : p(p), r(r) {}
+  bool isHasShare(Circle other) {
+    long double R1 = abs(this->r - other.r);
+    R1 *= R1;
+    long double R2 = this->r + other.r;
+    R2 *= R2;
+    long double dist_square = this->p.get_dist_square(other.p);
+
+    return (R1 <= dist_square && dist_square <= R2);
+  }
+  bool isOnCircle(Point point) {
+    long double dist_square = this->p.get_dist_square(point);
+    return (dist_square == this->r * this->r);
+  }
+};
+
 //---------------------------------------------------------------------------------------------------
 
 int main() {
-  ll n, q, x;
-  cin >> n >> q >> x;
+  int n;
+  cin >> n;
+  long double sx, sy, tx, ty;
+  cin >> sx >> sy >> tx >> ty;
+
+  Point p1(sx, sy);
+  Point p2(tx, ty);
+  vector<Circle> circles;
+  dsu uf(n);
+  int p1_group = -1;
+  int p2_group = -1;
+  for (int i = 0; i < n; i++) {
+    long double x, y, r;
+    cin >> x >> y >> r;
+    circles.push_back(Circle(Point(x, y), r));
+  }
+  for (int i = 0; i < n; i++) {
+    Circle c1 = circles[i];
+
+    if (p1_group < 0 && c1.isOnCircle(p1)) p1_group = i;
+    if (p2_group < 0 && c1.isOnCircle(p2)) p2_group = i;
+    for (int j = i + 1; j < n; j++) {
+      Circle c2 = circles[j];
+
+      if (c1.isHasShare(c2)) uf.merge(i, j);
+    }
+  }
+  yes_no(uf.same(p1_group, p2_group));
 }
