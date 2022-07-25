@@ -13,7 +13,6 @@ typedef vector<double> vd;
 typedef vector<vector<double>> vvd;
 typedef tuple<int, int, int> tiii;
 typedef vector<pair<ll, ll>> vpl;
-typedef pair<ll, ll> pl;
 typedef pair<string, string> ps;
 typedef pair<bool, bool> pb;
 typedef queue<pair<int, int>> que_pi;
@@ -25,13 +24,6 @@ template <class T> using min_heap = priority_queue<T, vector<T>, greater<>>;
 #define all(x) (x).begin(), (x).end()
 
 #define ForEach(it, c) for (__typeof(c).begin() it = (c).begin(); it != (c).end(); it++)
-#define rep(i, n) for (ll i = 0; i < n; i++)
-#define rep2(i, x, n) for (ll i = x; i < n; i++)
-#define rep3(i, x, n) for (ll i = 0; x < n; i++)
-
-#define REP(i, n) for (ll i = 0; i <= n; i++)
-#define REP2(i, x, n) for (ll i = x; i <= n; i++)
-#define REP3(i, x, n) for (ll i = 0; x <= n; i++)
 
 #define per(i, n) for (int i = n; i >= 0; --i)
 #define per2(i, n, x) for (int i = n; i >= x; --i)
@@ -321,30 +313,17 @@ bool bellman_ford(int s, vector<int> &d, vector<vector<edge>> &G) { // nは頂�
 }
 
 bool warshall_floyd(int V, vector<vector<ll>> &dp) {
-  rep(i, V) dp[i][i] = 0;
-  rep(k, V) {
-    rep(i, V) {
-      rep(j, V) {
+  for (int i = 0; i < V; i++) {
+    dp[i][i] = 0;
+  }
+  for (int k = 0; k < V; k++) {
+    for (int i = 0; i < V; i++) {
+      for (int j = 0; j < V; j++) {
         chmin(dp[i][j], dp[i][k] + dp[k][j]);
       }
     }
   }
-  rep(i, V) {
-    if (dp[i][i] < 0) return true;
-  }
-  return false;
-}
-
-bool warshall_floyd(int V, vector<vector<int>> &dp) {
-  rep(i, V) dp[i][i] = 0;
-  rep(k, V) {
-    rep(i, V) {
-      rep(j, V) {
-        chmin(dp[i][j], dp[i][k] + dp[k][j]);
-      }
-    }
-  }
-  rep(i, V) {
+  for (int i = 0; i < V; i++) {
     if (dp[i][i] < 0) return true;
   }
   return false;
@@ -399,7 +378,7 @@ public:
 };
 
 template <typename T> void vector_output(T vec) {
-  rep(i, vec.size()) {
+  for (int i = 0; i < vec.size(); i++) {
     cout << vec[i] << " \n"[i == vec.size() - 1];
   }
 }
@@ -408,8 +387,7 @@ vector<bool> get_prime(int n) {
   vector<bool> prime(n + 1, true);
   if (n >= 0) prime[0] = false;
   if (n >= 1) prime[1] = false;
-
-  REP2(i, 2, n) {
+  for (int i = 2; i <= n; i++) {
     if (prime[i]) {
       for (int j = i * 2; j <= n; j += i)
         prime[j] = false;
@@ -432,14 +410,18 @@ ll get_distance(int Q, ll MOD, ll *cost) {
 vector<ll> get_fact_table(int table_size, ll MOD) {
   vector<ll> fact(table_size);
   fact[0] = fact[1] = 1;
-  rep2(i, 2, table_size) fact[i] = (i * fact[i - 1]) % MOD;
+  for (int i = 2; i < table_size; i++) {
+    fact[i] = (i * fact[i - 1]) % MOD;
+  }
   return fact;
 }
 
 vector<ll> get_inv_table(int table_size, ll MOD) {
   vector<ll> inv(table_size);
   inv[1] = 1;
-  rep2(i, 2, table_size) inv[i] = inv[MOD % i] * (MOD - MOD / i) % MOD;
+  for (int i = 2; i < table_size; i++) {
+    inv[i] = inv[MOD % i] * (MOD - MOD / i) % MOD;
+  }
   return inv;
 }
 
@@ -447,7 +429,9 @@ vector<ll> get_factinv_table(int table_size, ll MOD) {
   vector<ll> factinv(table_size);
   vector<ll> inv = get_inv_table(table_size, MOD);
   factinv[0] = 1;
-  rep2(i, 1, table_size) factinv[i] = factinv[i - 1] * inv[i] % MOD;
+  for (int i = 1; i < table_size; i++) {
+    factinv[i] = factinv[i - 1] * inv[i] % MOD;
+  }
   return factinv;
 }
 
@@ -462,7 +446,9 @@ ll ncr(int n, int r, int table_size, ll MOD) {
 template <typename T> T get_cumulative_sum(T a) {
   int n = a.size();
   T s(n + 1, 0);
-  rep(i, n) s[i + 1] = s[i] + a[i];
+  for (int i = 0; i < ; i++) {
+    s[i + 1] = s[i] + a[i];
+  }
   return s;
 }
 
@@ -470,8 +456,8 @@ template <typename T> vector<vector<T>> get_2d_cumulative_sum(vector<vector<T>> 
   int n = a.size();
   int m = a[0].size();
   vector<vector<T>> s(n + 1, vector<T>(m + 1, 0));
-  rep(i, n) {
-    rep(j, m) {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
       s[i + 1][j + 1] = a[i][j] + s[i + 1][j] + s[i][j + 1] - s[i][j];
     }
   }
@@ -497,7 +483,7 @@ void yes_no(bool question) {
 
 vector<bool> get_divisor_table(int n) {
   vector<bool> table(n + 1, false);
-  REP2(i, 1, sqrt(n)) {
+  for (int i = 1; i <= sqrt(n); i++) {
     if (n % i == 0) {
       table[i] = true;
       table[n / i] = true;
@@ -506,8 +492,8 @@ vector<bool> get_divisor_table(int n) {
   return table;
 }
 
-vector<pl> factor(ll x) {
-  vector<pl> ans;
+vector<pair<ll, ll>> factor(ll x) {
+  vector<pair<ll, ll>> ans;
   for (ll i = 2; i * i <= x; i++)
     if (x % i == 0) {
       ans.push_back({i, 1});
@@ -637,13 +623,10 @@ public:
 };
 
 //---------------------------------------------------------------------------------------------------
-#define bit(x, i) (((x) >> (i)) & 1)
 int main() {
-  int n, c;
-  cin >> n >> c;
-  vector<pair<int, int>> op(n);
-  for (int i = 0; i < n; i++) {
-    cin >> op[i].first >> op[i].second;
-  }
-  vector<int> ans(n);
+  int s, t, m;
+  cin >> s >> t >> m;
+  vector G(s, vector<int>{});
+
+  for (int i = 0; i < m; i++) {}
 }
