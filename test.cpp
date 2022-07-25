@@ -9,9 +9,6 @@ typedef long long ll;
 typedef long double ld;
 typedef pair<ll, ll> Pl;
 typedef pair<int, int> Pi;
-typedef vector<int> vi;
-typedef vector<vector<int>> vvi;
-typedef vector<vector<vector<int>>> vvvi;
 typedef vector<string> vs;
 typedef vector<vector<string>> vvs;
 typedef vector<ll> vl;
@@ -22,7 +19,6 @@ typedef vector<double> vd;
 typedef vector<vector<double>> vvd;
 typedef tuple<int, int, int> tiii;
 typedef pair<int, int> pi;
-typedef vector<pair<int, int>> vpi;
 typedef vector<pair<ll, ll>> vpl;
 typedef pair<ll, ll> pl;
 typedef pair<string, string> ps;
@@ -217,7 +213,7 @@ int s(string s) {
   return sum;
 }
 
-double get_descent(int i, int j, vpi &vec) {
+double get_descent(int i, int j, vector<pair<int, int>> &vec) {
   double x1 = vec[i].first;
   double y1 = vec[i].second;
   double x2 = vec[j].first;
@@ -293,7 +289,7 @@ struct edge {
   int to, cost, idx;
 };
 
-void dijkstra(int s, vi &d, vector<vector<edge>> &G) {
+void dijkstra(int s, vector<int> &d, vector<vector<edge>> &G) {
   d[s] = 0;
   priority_queue<pair<int, int>> Q;
   Q.push(make_pair(0, s));
@@ -314,7 +310,7 @@ void dijkstra(int s, vi &d, vector<vector<edge>> &G) {
   }
 }
 
-bool bellman_ford(int s, vi &d, vector<vector<edge>> &G) { // nは頂点数、sは開始頂点
+bool bellman_ford(int s, vector<int> &d, vector<vector<edge>> &G) { // nは頂点数、sは開始頂点
   d[s] = 0;                                                // 開始点の距離は0
   int n = (int)d.size();
   for (int i = 0; i < n; i++) {
@@ -346,7 +342,7 @@ bool warshall_floyd(int V, vvl &dp) {
   return false;
 }
 
-bool warshall_floyd(int V, vvi &dp) {
+bool warshall_floyd(int V, vector<vector<int>> &dp) {
   rep(i, V) dp[i][i] = 0;
   rep(k, V) {
     rep(i, V) {
@@ -361,7 +357,7 @@ bool warshall_floyd(int V, vvi &dp) {
   return false;
 }
 
-int matrixchainmultiplication(int n, vi &p, vvi &m) {
+int matrixchainmultiplication(int n, vector<int> &p, vector<vector<int>> &m) {
   for (int i = 1; i <= n; i++)
     m[i][i] = 0;
   for (int l = 2; l <= n; l++) {
@@ -649,34 +645,13 @@ public:
 };
 
 //---------------------------------------------------------------------------------------------------
-
+#define bit(x, i) (((x) >> (i)) & 1)
 int main() {
-  int n;
-  cin >> n;
-  long double sx, sy, tx, ty;
-  cin >> sx >> sy >> tx >> ty;
-
-  Point p1(sx, sy);
-  Point p2(tx, ty);
-  vector<Circle> circles;
-  dsu uf(n);
-  int p1_group = -1;
-  int p2_group = -1;
+  int n, c;
+  cin >> n >> c;
+  vector<pair<int, int>> op(n);
   for (int i = 0; i < n; i++) {
-    long double x, y, r;
-    cin >> x >> y >> r;
-    circles.push_back(Circle(Point(x, y), r));
+    cin >> op[i].first >> op[i].second;
   }
-  for (int i = 0; i < n; i++) {
-    Circle c1 = circles[i];
-
-    if (p1_group < 0 && c1.isOnCircle(p1)) p1_group = i;
-    if (p2_group < 0 && c1.isOnCircle(p2)) p2_group = i;
-    for (int j = i + 1; j < n; j++) {
-      Circle c2 = circles[j];
-
-      if (c1.isHasShare(c2)) uf.merge(i, j);
-    }
-  }
-  yes_no(uf.same(p1_group, p2_group));
+  vector<int>ans(n);
 }
