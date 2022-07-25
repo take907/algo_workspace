@@ -7,18 +7,11 @@ using namespace atcoder;
 
 typedef long long ll;
 typedef long double ld;
-typedef pair<ll, ll> Pl;
-typedef pair<int, int> Pi;
 typedef vector<string> vs;
 typedef vector<vector<string>> vvs;
-typedef vector<ll> vl;
-typedef vector<vector<ll>> vvl;
-typedef vector<bool> vb;
-typedef vector<vector<bool>> vvb;
 typedef vector<double> vd;
 typedef vector<vector<double>> vvd;
 typedef tuple<int, int, int> tiii;
-typedef pair<int, int> pi;
 typedef vector<pair<ll, ll>> vpl;
 typedef pair<ll, ll> pl;
 typedef pair<string, string> ps;
@@ -311,7 +304,7 @@ void dijkstra(int s, vector<int> &d, vector<vector<edge>> &G) {
 }
 
 bool bellman_ford(int s, vector<int> &d, vector<vector<edge>> &G) { // nは頂点数、sは開始頂点
-  d[s] = 0;                                                // 開始点の距離は0
+  d[s] = 0;                                                         // 開始点の距離は0
   int n = (int)d.size();
   for (int i = 0; i < n; i++) {
     for (int v = 0; v < n; v++) {
@@ -327,7 +320,7 @@ bool bellman_ford(int s, vector<int> &d, vector<vector<edge>> &G) { // nは頂�
   return true;
 }
 
-bool warshall_floyd(int V, vvl &dp) {
+bool warshall_floyd(int V, vector<vector<ll>> &dp) {
   rep(i, V) dp[i][i] = 0;
   rep(k, V) {
     rep(i, V) {
@@ -412,7 +405,7 @@ template <typename T> void vector_output(T vec) {
 }
 
 vector<bool> get_prime(int n) {
-  vb prime(n + 1, true);
+  vector<bool> prime(n + 1, true);
   if (n >= 0) prime[0] = false;
   if (n >= 1) prime[1] = false;
 
@@ -436,33 +429,32 @@ ll get_distance(int Q, ll MOD, ll *cost) {
   ret = (ret + cost[b[(Q - 1) & 1] - 1]) % MOD;
   return ret;
 }
-
-vl get_fact_table(int table_size, ll MOD) {
-  vl fact(table_size);
+vector<ll> get_fact_table(int table_size, ll MOD) {
+  vector<ll> fact(table_size);
   fact[0] = fact[1] = 1;
   rep2(i, 2, table_size) fact[i] = (i * fact[i - 1]) % MOD;
   return fact;
 }
 
-vl get_inv_table(int table_size, ll MOD) {
-  vl inv(table_size);
+vector<ll> get_inv_table(int table_size, ll MOD) {
+  vector<ll> inv(table_size);
   inv[1] = 1;
   rep2(i, 2, table_size) inv[i] = inv[MOD % i] * (MOD - MOD / i) % MOD;
   return inv;
 }
 
-vl get_factinv_table(int table_size, ll MOD) {
-  vl factinv(table_size);
-  vl inv = get_inv_table(table_size, MOD);
+vector<ll> get_factinv_table(int table_size, ll MOD) {
+  vector<ll> factinv(table_size);
+  vector<ll> inv = get_inv_table(table_size, MOD);
   factinv[0] = 1;
   rep2(i, 1, table_size) factinv[i] = factinv[i - 1] * inv[i] % MOD;
   return factinv;
 }
 
 ll ncr(int n, int r, int table_size, ll MOD) {
-  vl fact = get_fact_table(table_size, MOD);
-  vl inv = get_inv_table(table_size, MOD);
-  vl factinv = get_factinv_table(table_size, MOD);
+  vector<ll> fact = get_fact_table(table_size, MOD);
+  vector<ll> inv = get_inv_table(table_size, MOD);
+  vector<ll> factinv = get_factinv_table(table_size, MOD);
 
   return ((n - r >= 0 && r >= 0) ? fact[n] * factinv[r] % MOD * factinv[n - r] % MOD : 0);
 }
@@ -503,8 +495,8 @@ void yes_no(bool question) {
   cout << (question ? "Yes" : "No") << endl;
 }
 
-vb get_divisor_table(int n) {
-  vb table(n + 1, false);
+vector<bool> get_divisor_table(int n) {
+  vector<bool> table(n + 1, false);
   REP2(i, 1, sqrt(n)) {
     if (n % i == 0) {
       table[i] = true;
@@ -653,5 +645,5 @@ int main() {
   for (int i = 0; i < n; i++) {
     cin >> op[i].first >> op[i].second;
   }
-  vector<int>ans(n);
+  vector<int> ans(n);
 }
