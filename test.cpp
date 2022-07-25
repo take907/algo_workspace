@@ -628,5 +628,23 @@ int main() {
   cin >> s >> t >> m;
   vector G(s, vector<int>{});
 
-  for (int i = 0; i < m; i++) {}
+  for (int i = 0, u, v; i < m; i++) {
+    cin >> u >> v;
+    G[u - 1].push_back(v - s - 1);
+  }
+  vector dp(t, vector(t, -1));
+  for (int i = 0; i < s; i++) {
+    for (auto &u : G[i]) {
+      for (auto &v : G[i]) {
+        if (u == v) continue;
+        if (dp[u][v] != -1) {
+          cout << i + 1 << dp[u][v] + 1 << " ";
+          cout << u + s + 1 << " " << v + s + 1 << endl;
+          exit(0);
+        }
+        dp[u][v] = i;
+      }
+    }
+  }
+  cout << "-1" << endl;
 }
