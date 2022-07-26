@@ -446,7 +446,7 @@ ll ncr(int n, int r, int table_size, ll MOD) {
 template <typename T> T get_cumulative_sum(T a) {
   int n = a.size();
   T s(n + 1, 0);
-  for (int i = 0; i < ; i++) {
+  for (int i = 0; i < n; i++) {
     s[i + 1] = s[i] + a[i];
   }
   return s;
@@ -622,29 +622,33 @@ public:
   }
 };
 
-//---------------------------------------------------------------------------------------------------
-int main() {
-  int s, t, m;
-  cin >> s >> t >> m;
-  vector G(s, vector<int>{});
+void ok_ng(bool ok) {
+  cout << (ok ? "OK" : "NG") << endl;
+}
 
-  for (int i = 0, u, v; i < m; i++) {
-    cin >> u >> v;
-    G[u - 1].push_back(v - s - 1);
-  }
-  vector dp(t, vector(t, -1));
-  for (int i = 0; i < s; i++) {
-    for (auto &u : G[i]) {
-      for (auto &v : G[i]) {
-        if (u == v) continue;
-        if (dp[u][v] != -1) {
-          cout << i + 1 << dp[u][v] + 1 << " ";
-          cout << u + s + 1 << " " << v + s + 1 << endl;
-          exit(0);
-        }
-        dp[u][v] = i;
-      }
+//---------------------------------------------------------------------------------------------------
+int n, m, q, a[50], b[50], c[50], d[50];
+
+int ans = 0;
+int A[10];
+
+void dfs(int cu = 0, int lst = 1) {
+  if (cu == n) {
+    int tot = 0;
+    for (int i = 0; i < q; i++) {
+      if (A[b[i]] - A[a[i]] == c[i]) tot += d[i];
+      chmax(ans, tot);
+      return;
+    }
+    for (int nxt = lst; nxt < m + 1; nxt++) {
+      A[cu] = nxt;
+      dfs(cu + 1, nxt);
     }
   }
-  cout << "-1" << endl;
+}
+
+int main() {
+  for(int i=0;i<100;i++){
+    cout << 2019*(i+1) << endl;
+  }
 }
