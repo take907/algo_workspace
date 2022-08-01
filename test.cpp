@@ -7,16 +7,8 @@ using namespace atcoder;
 
 typedef long long ll;
 typedef long double ld;
-typedef vector<string> vs;
-typedef vector<vector<string>> vvs;
 typedef vector<double> vd;
 typedef vector<vector<double>> vvd;
-typedef tuple<int, int, int> tiii;
-typedef vector<pair<ll, ll>> vpl;
-typedef pair<string, string> ps;
-typedef pair<bool, bool> pb;
-typedef queue<pair<int, int>> que_pi;
-typedef queue<pair<ll, ll>> que_pl;
 
 template <class T> using max_heap = priority_queue<T>;
 template <class T> using min_heap = priority_queue<T, vector<T>, greater<>>;
@@ -24,12 +16,6 @@ template <class T> using min_heap = priority_queue<T, vector<T>, greater<>>;
 #define all(x) (x).begin(), (x).end()
 
 #define ForEach(it, c) for (__typeof(c).begin() it = (c).begin(); it != (c).end(); it++)
-
-#define per(i, n) for (int i = n; i >= 0; --i)
-#define per2(i, n, x) for (int i = n; i >= x; --i)
-#define srep(i, s, t) for (int i = s; i < (t); ++i)
-
-#define MOD1000000007 1000000007
 
 int chtoi(char ch) {
   return ch - '0';
@@ -205,24 +191,6 @@ double get_descent(int i, int j, vector<pair<int, int>> &vec) {
   double y2 = vec[j].second;
 
   return (y2 - y1) / (x2 - x1);
-}
-
-struct info {
-  ll aoki, takahashi, sum;
-};
-
-bool comp(info &tmp1, info &tmp2) {
-  if (tmp1.sum > tmp2.sum) {
-    return true;
-  } else if (tmp1.sum == tmp2.sum) {
-    if (tmp1.aoki >= tmp2.aoki) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return false;
-  }
 }
 
 int inv(int a, int M) {
@@ -627,28 +595,53 @@ void ok_ng(bool ok) {
 }
 
 //---------------------------------------------------------------------------------------------------
-int n, m, q, a[50], b[50], c[50], d[50];
+using P = pair<int, int>;
 
-int ans = 0;
-int A[10];
-
-void dfs(int cu = 0, int lst = 1) {
-  if (cu == n) {
-    int tot = 0;
-    for (int i = 0; i < q; i++) {
-      if (A[b[i]] - A[a[i]] == c[i]) tot += d[i];
-      chmax(ans, tot);
-      return;
+bool comp(P a, P b) {
+  if (a.first > b.first)
+    return true;
+  else if (a.first == b.first) {
+    if (a.second < b.second)
+      return true;
+    else {
+      return false;
     }
-    for (int nxt = lst; nxt < m + 1; nxt++) {
-      A[cu] = nxt;
-      dfs(cu + 1, nxt);
-    }
+  } else {
+    return false;
   }
 }
 
 int main() {
-  for(int i=0;i<100;i++){
-    cout << 2019*(i+1) << endl;
+  int n, k;
+  cin >> n >> k;
+  vector<int> under(n + 5, -1);
+  vector<int> res(n + 5, -1);
+  vector<int> pile(n + 5, 0);
+  set<int> st;
+
+  for (int i = 1; i <= n; i++) {
+    int x;
+    cin >> x;
+    auto it = st.upper_bound(x);
+    if (it == st.end()) {
+      pile[x] = 1;
+      st.insert(x);
+    } else {
+      pile[x] = pile[*it] + 1;
+      under[x] = *it;
+      st.insert(x);
+      st.erase(it);
+    }
+
+    if (pile[x] == k) {
+      st.erase(x);
+      for (int j = 0; j < k; j++) {
+        res[x]=i;
+        x=under[x];
+      }
+    }
+  }
+  for(int i=1;i<=n;i++){
+    cout << res[i] << endl;
   }
 }

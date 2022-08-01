@@ -3751,6 +3751,43 @@ abc261e{
 
 }
 
+abc261f{
+  #include <bits/stdc++.h>
+  #include <atcoder/all>
+  using namespace std;
+  using namespace atcoder;
+
+  int main() {
+    int n, x, sz;
+    int c[300000];
+    vector<int>a[300001];
+    long long ans = 0;
+
+    cin >> n;
+    for (int i = 0; i < n; i++)cin >> c[i];
+    for (int i = 0; i < n; i++) {
+      cin >> x;
+      a[0].push_back(x - 1);
+      a[c[i]].push_back(x - 1);
+    }
+
+    fenwick_tree<long long> fw(n);
+    for (int i = 0; i <= n; i++) {
+      sz = a[i].size();
+      for (int j = 0; j < sz; j++) {
+        if (i == 0)ans += fw.sum(a[i][j] + 1, n);
+        else ans -= fw.sum(a[i][j] + 1, n);
+        fw.add(a[i][j], 1LL);
+      }
+      for (int j = 0; j < sz; j++)fw.add(a[i][j], -1LL);
+    }
+
+    cout << ans << endl;
+    return 0;
+  }
+
+}
+
 abc260b{
   #include<bits/stdc++.h>
 
@@ -3798,6 +3835,49 @@ abc260b{
     for(int i=1;i<=n;i++){
       if(passed[i]){cout << i << "\n";}
     }
+    return 0;
+  }
+
+}
+
+abc260d{
+  #include<bits/stdc++.h>
+
+  using namespace std;
+
+  int main(){
+    int n,k;
+    cin >> n >> k;
+    vector<int> under(n+5,-1);
+    vector<int> pile(n+5,0);
+    set<int> st;
+    vector<int> res(n+5,-1);
+    for(int i=1;i<=n;i++){
+      int p;
+      cin >> p;
+      auto it=st.upper_bound(p);
+      if(it==st.end()){
+        pile[p]=1;
+        st.insert(p);
+      }
+      else{
+        under[p]=(*it);
+        pile[p]=pile[(*it)]+1;
+        st.erase(it);
+        st.insert(p);
+      }
+      
+      if(pile[p]==k){
+        st.erase(p);
+        int x=p;
+        for(int j=0;j<k;j++){
+          res[x]=i;
+          x=under[x];
+        }
+      }
+    }
+
+    for(int i=1;i<=n;i++){cout << res[i] << "\n";}
     return 0;
   }
 
@@ -5678,4 +5758,340 @@ abc164f{
     }
   }
 
+}
+
+abc163e{
+  #include "bits/stdc++.h"
+  using namespace std;
+  typedef long long ll;
+
+  int main() {
+      int n; cin >> n;
+      vector<pair<ll, int>> a(n);
+      for (int i = 0; i < n; i++) {
+          cin >> a[i].first;
+          a[i].second = i + 1;
+      }
+      sort(a.rbegin(), a.rend());
+      vector<vector<ll>> dp(n + 1, vector<ll>(n + 1, 0));
+      dp[0][0] = 0;
+      for (int k = 1; k <= n; k++) {
+          for (int i = 0; i <= k; i++) {
+              int j = k - i;
+              if (i - 1 >= 0) dp[i][j] = max(dp[i][j], dp[i - 1][j] + a[k - 1].first * (a[k - 1].second - i));
+              if (j - 1 >= 0) dp[i][j] = max(dp[i][j], dp[i][j - 1] + a[k - 1].first * (n - j + 1 - a[k - 1].second));
+          }
+      }
+      ll ans = 0;
+      for (int i = 0; i <= n; i++) {
+          ans = max(ans, dp[i][n - i]);
+      }
+      cout << ans << endl;
+      return 0;
+  }
+}
+
+abc163d{
+  #include <iostream>
+  #include <atcoder/modint>
+
+  int main() {
+      long long N, K;
+      std::cin >> N >> K;
+      atcoder::modint1000000007 ans = (N-K+2) * (N*N+N*K-2*K*K+N+2*K+6) / 6;
+      std::cout << ans.val() << std::endl;
+      return 0;
+  }
+}
+
+abc163f{
+  #include <bits/stdc++.h>
+  using namespace std;
+  template<typename T1,typename T2> inline void chmin(T1 &a,T2 b){if(a>b) a=b;}
+  template<typename T1,typename T2> inline void chmax(T1 &a,T2 b){if(a<b) a=b;}
+  using Int = long long;
+  const char newl = '\n';
+
+
+  template<typename F>
+  struct FixPoint : F{
+    FixPoint(F&& f):F(forward<F>(f)){}
+    template<typename... Args>
+    decltype(auto) operator()(Args&&... args) const{
+      return F::operator()(*this,forward<Args>(args)...);
+    }
+  };
+  template<typename F>
+  inline decltype(auto) MFP(F&& f){
+    return FixPoint<F>{forward<F>(f)};
+  }
+
+  //INSERT ABOVE HERE
+  signed main(){
+    cin.tie(0);
+    ios::sync_with_stdio(0);
+
+    int n;
+    cin>>n;
+    vector<int> cs(n);
+    for(int i=0;i<n;i++) cin>>cs[i],cs[i]--;
+
+    vector<vector<int>> G(n);
+    for(int i=1;i<n;i++){
+      int a,b;
+      cin>>a>>b;
+      a--;b--;
+      G[a].emplace_back(b);
+      G[b].emplace_back(a);
+    }
+
+    using ll = long long;
+    ll all=0;
+    vector<ll> cnt(n,0),sub(n,0);
+
+    vector<ll> ans(n,(ll)n*(n-1)/2);
+    MFP([&](auto dfs,int v,int p)->int{
+      sub[v]=1;
+      ll bfr=cnt[cs[v]];
+      for(int u:G[v]){
+        if(u==p) continue;
+        ll pre=all-cnt[cs[v]];
+        sub[v]+=dfs(u,v);
+        ll nxt=all-cnt[cs[v]];
+        ans[cs[v]]-=(nxt-pre)*(nxt-pre-1)/2;
+      }
+      cnt[cs[v]]=bfr+sub[v];
+      all++;
+      return sub[v];
+    })(0,-1);
+
+    for(int c=0;c<n;c++){
+      ll pre=0,nxt=n-cnt[c];
+      ans[c]-=(nxt-pre)*(nxt-pre-1)/2;
+    }
+    for(int c:cs) ans[c]++;
+
+    for(ll a:ans) cout<<a<<newl;
+    return 0;
+  }
+
+}
+
+abc162e{
+  int N, K;
+  mint cnt[101010];
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N >> K;
+
+      rrep(g, K, 1) {
+          cnt[g] = mint(K / g) ^ N;
+          int gg = g * 2;
+          while (gg <= K) {
+              cnt[g] -= cnt[gg];
+              gg += g;
+          }
+      }
+
+      mint ans = 0;
+      rep(g, 1, K + 1) ans += cnt[g] * g;
+      cout << ans << endl;
+  }
+}
+
+abc162d{
+  int N; string S;
+  int R = 1, G = 2, B = 4;
+  int RGB = 7;
+  int cnt[8];
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N >> S;
+      fore(c, S) {
+          if (c == 'R') c = R;
+          else if (c == 'G') c = G;
+          else c = B;
+      }
+
+      int r = 0, g = 0, b = 0;
+      ll ans = 0;
+      rep(j, 0, N) {
+          rep(k, j + 1, N) {
+              if (S[j] == S[k]) continue;
+
+              int Si = RGB - S[j] - S[k];
+              ans += cnt[Si];
+
+              int i = j - (k - j);
+              if (0 <= i) {
+                  int msk = S[i] | S[j] | S[k];
+                  if (msk == RGB) ans--;
+              }
+          }
+
+          cnt[S[j]]++;
+      }
+      cout << ans << endl;
+  }
+}
+
+
+abc162f{
+  int N, A[201010];
+  ll dp[201010][2][4][3];
+  //---------------------------------------------------------------------------------------------------
+  void _main() {
+      cin >> N;
+      rep(i, 0, N) cin >> A[i];
+
+      rep(i, 0, N + 1) rep(top, 0, 2) rep(two, 0, 3) rep(three, 0, 2) dp[i][top][two][three] = -infl;
+
+      dp[0][0][0][0] = 0;
+
+      dp[1][1][0][0] = A[0];
+      dp[2][0][0][0] = A[1];
+      dp[3][0][1][0] = A[2];
+
+      rep(i, 0, N) rep(top, 0, 2) rep(two, 0, 3) rep(three, 0, 2) if(-infl < dp[i][top][two][three]) {
+          chmax(dp[i + 2][top][two][three], dp[i][top][two][three] + A[i + 1]);
+          chmax(dp[i + 3][top][two + 1][three], dp[i][top][two][three] + A[i + 2]);
+          chmax(dp[i + 4][top][two][three + 1], dp[i][top][two][three] + A[i + 3]);
+      }
+
+      ll ans = -infl;
+      rep(i, 1, N + 1) rep(top, 0, 2) rep(two, 0, 3) rep(three, 0, 2) if (-infl < dp[i][top][two][three]) {
+          int cnt = 0;
+          int tot = i;
+          if (top == 1) cnt++, tot--;
+
+          tot -= two;
+          tot -= three * 2;
+
+          cnt += tot / 2;
+
+          if (cnt == N / 2) chmax(ans, dp[i][top][two][three]);
+      }
+      cout << ans << endl;
+  }
+}
+
+abc262c{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  int main() {
+      int n;
+      cin >> n;
+      vector<int> a(n);
+      int same = 0;
+      for (int i = 0; i < n; ++i) {
+          cin >> a[i];
+          a[i] -= 1;
+          if (a[i] == i) {
+              same += 1;
+          }
+      }
+      long long ans = (long long)same * (same - 1) / 2;
+      for (int i = 0; i < n; ++i) {
+          if (a[i] > i and a[a[i]] == i) {
+              ans += 1;
+          }
+      }
+      cout << ans << '\n';
+      return 0;
+  }
+
+}
+
+abc262d{
+  #include <bits/stdc++.h>
+  #include <atcoder/modint>
+  using namespace std;
+  using namespace atcoder;
+  using mint = modint998244353;
+
+  int main() {
+      
+    int N;
+    cin>>N;
+    
+    vector<int> a(N);
+    for(int i=0;i<N;i++)cin>>a[i];
+    
+    mint ans = 0;
+    
+    for(int i=1;i<=N;i++){
+      vector dp(N+1,vector(i+1,vector<mint>(i,0)));
+      dp[0][0][0] = 1;
+      for(int j=0;j<N;j++){
+        for(int k=0;k<=i;k++){
+          for(int l=0;l<i;l++){
+            dp[j+1][k][l] += dp[j][k][l];
+            if(k!=i)dp[j+1][k+1][(l+a[j])%i] += dp[j][k][l];
+          }
+        }
+      }
+      ans += dp[N][i][0];
+    }
+    
+    cout<<ans.val()<<endl;
+    
+    return 0;
+  }
+
+}
+
+abc262e{
+  #include <bits/stdc++.h>
+  #include <atcoder/modint>
+  using namespace std;
+
+  using mint = atcoder::modint998244353;
+
+  mint fact(const int n) {
+      static vector<mint> v = {1};
+      while ((int)v.size() <= n) {
+          v.push_back(v.back() * v.size());
+      }
+      return v[n];
+  }
+
+  mint inv_fact(const int n) {
+      static vector<mint> u = {0, 1}, v = {1, 1};
+      for (int i = (int)u.size(); i <= n; ++i) {
+          u.push_back(-mint(mint::mod() / i) * u[mint::mod() % i]);
+          v.push_back(v.back() * u.back());
+      }
+      return v[n];
+  }
+
+  mint binom(const int n, const int k) {
+      return fact(n) * inv_fact(k) * inv_fact(n - k);
+  }
+
+  int main() {
+      int n, m, k;
+      cin >> n >> m >> k;
+      vector<int> deg(n);
+      while (m--) {
+          int u, v;
+          cin >> u >> v;
+          u -= 1, v -= 1;
+          deg[u] += 1, deg[v] += 1;
+      }
+      int odd = 0;
+      for (const int x : deg) {
+          if (x % 2 == 1) {
+              odd += 1;
+          }
+      }
+      mint ans = 0;
+      for (int i = 0; i <= k; i += 2) {
+          if (i <= odd and k - i <= n - odd) {
+              ans += binom(odd, i) * binom(n - odd, k - i);
+          }
+      }
+      cout << ans.val() << '\n';
+      return 0;
+  }
 }
