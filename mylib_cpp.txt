@@ -3234,7 +3234,10 @@ abc257d{
       dist[i][j]=(abs(data[i][0]-data[j][0])+abs(data[i][1]-data[j][1])+data[i][2]-1)/data[i][2];
     }
 
-    for(int k=0;k<N;k++)for(int i=0;i<N;i++)for(int j=0;j<N;j++)dist[i][j]=min(dist[i][j],max(dist[i][k],dist[k][j]));
+    for(int k=0;k<N;k++)
+      for(int i=0;i<N;i++)
+        for(int j=0;j<N;j++)
+          dist[i][j]=min(dist[i][j],max(dist[i][k],dist[k][j]));
 
     long long ans=1e15;
     for(int i=0;i<N;i++){
@@ -6094,4 +6097,98 @@ abc262e{
       cout << ans.val() << '\n';
       return 0;
   }
+}
+
+abc258e{
+  #include <bits/stdc++.h>
+  using namespace std;
+
+  using ll = long long;
+
+  int main() {
+      int n, q, x;
+      cin >> n >> q >> x;
+      vector<int> w(2 * n);
+      for (int i = 0; i < n; ++i) {
+          cin >> w[i];
+          w[i + n] = w[i];
+      }
+      const ll all = accumulate(begin(w), begin(w) + n, 0ll);
+      vector<int> count(n, (x / all) * n);
+      x %= all;
+      for (int i = 0, j = 0, s = 0; i < n; ++i) {
+          if (j < i) {
+              j = i;
+              s = 0;
+          }
+          while (s < x) {
+              s += w[j];
+              j += 1;
+          }
+          count[i] += j - i;
+          s -= w[i];
+      }
+      vector<int> order(n, -1), path;
+      int loop = -1;
+      for (int u = 0, k = 0;; ++k) {
+          if (order[u] != -1) {
+              loop = k - order[u];
+              break;
+          }
+          order[u] = k;
+          path.push_back(u);
+          u = (u + count[u]) % n;
+      }
+      const int non_loop = (int)path.size() - loop;
+      while (q--) {
+          ll k;
+          cin >> k;
+          k -= 1;
+          if (k < non_loop) {
+              cout << count[path[k]] << '\n';
+          } else {
+              k = (k - non_loop) % loop;
+              cout << count[path[non_loop + k]] << '\n';
+          }
+      }
+      return 0;
+  }
+}
+
+abc161e{
+  #include<stdio.h>
+  #define max(p,q)((p)>(q)?(p):(q))
+  #define min(p,q)((p)<(q)?(p):(q))
+
+  char s[200010];
+  int a[200010];
+  int mae[200010],usiro[200010];
+  //  mae[i]=[0,x)でi日働けるような最小のx
+  //usiro[i]=[x,N)でi日働けるような最大のx
+  int main(){
+    int N,K,C;
+    scanf("%d%d%d%s",&N,&K,&C,s);
+    int maecnt=0;
+    mae[0]=-1e8;
+    for(int i=0;i<N;i++)if(s[i]=='o'){
+      mae[++maecnt]=i+1;
+      i+=C;
+    }
+    
+    int usirocnt=0;
+    usiro[0]=1e8;
+    for(int i=N-1;i>=0;i--)if(s[i]=='o'){
+      usiro[++usirocnt]=i;
+      i-=C;
+    }
+    
+    for(int i=0;i<=K;i++)if(i<=maecnt&&K-i<=usirocnt&&usiro[K-i]-mae[i]>=C){
+      a[max(0,mae[i])]++;
+      a[min(N,usiro[K-i])]--;
+    }
+    
+    for(int i=1;i<N;i++)a[i]+=a[i-1];
+    for(int i=0;i<N;i++)if(!a[i])printf("%d\n",i+1);
+  }
+
 }

@@ -13,8 +13,6 @@ typedef vector<vector<double>> vvd;
 template <class T> using max_heap = priority_queue<T>;
 template <class T> using min_heap = priority_queue<T, vector<T>, greater<>>;
 
-#define all(x) (x).begin(), (x).end()
-
 #define ForEach(it, c) for (__typeof(c).begin() it = (c).begin(); it != (c).end(); it++)
 
 int chtoi(char ch) {
@@ -73,9 +71,6 @@ string toBinary(ll n) {
   reverse(r.begin(), r.end());
   return r;
 }
-
-ll LL_INF = 1LL << 55;
-int INT_INF = 2LL << 9;
 
 class UnionFind {
 private:
@@ -270,7 +265,7 @@ bool bellman_ford(int s, vector<int> &d, vector<vector<edge>> &G) { // nは頂�
     for (int v = 0; v < n; v++) {
       for (int k = 0; k < G[v].size(); k++) {
         edge e = G[v][k];
-        if (d[v] != INT_INF && d[e.to] > d[v] + e.cost) {
+        if (d[v] != INT_MAX && d[e.to] > d[v] + e.cost) {
           d[e.to] = d[v] + e.cost;
           if (i == n - 1) return false; // n回目にも更新があるなら負の閉路が存在
         }
@@ -303,7 +298,7 @@ int matrixchainmultiplication(int n, vector<int> &p, vector<vector<int>> &m) {
   for (int l = 2; l <= n; l++) {
     for (int i = 1; i <= n - l + 1; i++) {
       int j = i + l - 1;
-      m[i][j] = INT_INF;
+      m[i][j] = INT_MAX;
       for (int k = i; k <= j - 1; k++) {
         m[i][j] = min(m[i][j], m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j]);
       }
@@ -492,28 +487,28 @@ template <typename T> T get_manhattan_distance(pair<T, T> s, pair<T, T> t) {
 }
 
 template <typename T> int get_num_lower(vector<T> &vec, T x) {
-  int res = lower_bound(all(vec), x) - vec.begin();
+  int res = lower_bound(vec.begin(), vec.end(), x) - vec.begin();
   return res;
 }
 
 template <typename T> int get_num_lower_and_equal(vector<T> &vec, T x) {
-  int res = upper_bound(all(vec), x) - vec.begin();
+  int res = upper_bound(vec.begin(), vec.end(), x) - vec.begin();
   return res;
 }
 
 template <typename T> int get_num_greater(vector<T> &vec, T x) {
-  int res = vec.end() - upper_bound(all(vec), x);
+  int res = vec.end() - upper_bound(vec.begin(), vec.end(), x);
   return res;
 }
 
 template <typename T> int get_num_greater_and_equal(vector<T> &vec, T x) {
-  int res = vec.end() - lower_bound(all(vec), x);
+  int res = vec.end() - lower_bound(vec.begin(), vec.end(), x);
   return res;
 }
 
 template <typename T> T get_nearest(vector<T> &a, T b) {
   int n = a.size();
-  int pos = lower_bound(all(a), b) - a.begin();
+  int pos = lower_bound(a.begin(), a.end(), b) - a.begin();
   int diff1 = INT_MAX, diff2 = INT_MAX;
   int pos1 = min(pos, n - 1);
   int pos2 = max(0, pos - 1);
@@ -595,53 +590,109 @@ void ok_ng(bool ok) {
 }
 
 //---------------------------------------------------------------------------------------------------
-using P = pair<int, int>;
-
-bool comp(P a, P b) {
-  if (a.first > b.first)
-    return true;
-  else if (a.first == b.first) {
-    if (a.second < b.second)
-      return true;
-    else {
-      return false;
-    }
-  } else {
-    return false;
+ll n, k;
+ll C(ll l, ll r) {
+  ll m = (l + r) / 2;
+  while ((n - k * m) * (n - k * (m - 1)) > 0) {
+    m = (l + r) / 2;
+    if (n - k * m > 0)
+      r = m;
+    else
+      l = m;
   }
+  return l;
 }
 
 int main() {
-  int n, k;
-  cin >> n >> k;
-  vector<int> under(n + 5, -1);
-  vector<int> res(n + 5, -1);
-  vector<int> pile(n + 5, 0);
-  set<int> st;
+  string s;
+  int MAX_N = 200010;
+  vector<int> a(MAX_N), mae(MAX_N), usiro(MAX_N);
 
-  for (int i = 1; i <= n; i++) {
-    int x;
-    cin >> x;
-    auto it = st.upper_bound(x);
-    if (it == st.end()) {
-      pile[x] = 1;
-      st.insert(x);
-    } else {
-      pile[x] = pile[*it] + 1;
-      under[x] = *it;
-      st.insert(x);
-      st.erase(it);
-    }
-
-    if (pile[x] == k) {
-      st.erase(x);
-      for (int j = 0; j < k; j++) {
-        res[x]=i;
-        x=under[x];
-      }
+  int n, k, c;
+  cin >> n >> k >> c;
+  int maecnt = 0;
+  mae[0] = -1e8;
+  for (int i = 0; i < n; i++) {
+    if (s[i] == 'o') {
+      mae[++maecnt] = i + 1;
+      i += c;
     }
   }
-  for(int i=1;i<=n;i++){
-    cout << res[i] << endl;
+  int usirocnt = 0;
+  usiro[0] = 1e8;
+  for (int i = n - 1; i >= 0; i--) {
+    usiro[++usirocnt] = i;
+    i -= c;
+  }
+
+  for (int i = 0; i <= k; i++) {
+    if (i <= maecnt && k - i <= usirocnt && usiro[k - i] - mae[i] >= c) {
+      a[max(0, mae[i])]++;
+      a[min(n, usiro[k - i])]--;
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    a[i] += a[i - 1];
+  }
+  for (int i = 0; i < n; i++) {
+    if (!a[i]) cout << i + 1 << endl;
+  }
+
+  int mcnt = 0;
+  mae[0] = -1e8;
+  for (int i = 0; i < n; i++) {
+    if (s[i] == 'o') {
+      mae[++maecnt] = i + 1;
+      i += c;
+    }
+  }
+  int ucnt = 0;
+  usiro[0] = 1e8;
+  for (int i = n - 1; i >= 0; i--) {
+    if (s[i] == 'o') {
+      usiro[++ucnt] = i;
+      i -= c;
+    }
+  }
+
+  for (int i = 0; i <= k; i++) {
+    if (i <= mcnt && k - i <= ucnt && usiro[k - i] - mae[i] >= c) {
+      a[max(0, mae[i])]++;
+      a[min(n, usiro[k - i])]--;
+    }
+  }
+  for (int i = 1; i <= n; i++) {
+    a[i] += a[i - 1];
+    for (int i = 0; i < n; i++) {
+      if (!a[i]) cout << i + 1 << endl;
+    }
+  }
+  int mcnt = 0;
+  mae[0] = -1e8;
+  for (int i = 0; i < n; i++) {
+    if (s[i] == 'o') {
+      mae[++mcnt] = i + 1;
+      i += c;
+    }
+  }
+  int ucnt = 0;
+  usiro[0] = 1e8;
+  for (int i = n - 1; i >= 0; i--) {
+    if (s[i] == 'o') {
+      usiro[++ucnt] = i;
+      i -= c;
+    }
+  }
+  for (int i = 0; i <= k; i++) {
+    if (i <= maecnt && k - i <= usirocnt && usiro[k - i] - mae[i] >= c) {
+      a[max(0, mae[i])]++;
+      a[min(n, usiro[k - i])]--;
+    }
+  }
+  for (int i = 1; i <= n; i++) {
+    a[i] += a[i - 1];
+  }
+  for (int i = 0; i < n; i++) {
+    if (!a[i]) cout << i + 1 << endl;
   }
 }
